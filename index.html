@@ -183,6 +183,12 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 .grp.champ::before{content:"👑";position:absolute;top:-24px;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:2rem;line-height:1;animation:crownIn .8s cubic-bezier(.3,1.6,.5,1) both}
 .grp.mvp{border-left-color:#d4a017;background:#fffbea}
 @keyframes crownIn{from{opacity:0;transform:translate(-50%,-34px) rotate(-30deg) scale(.4)}to{opacity:1;transform:translateX(-50%) rotate(-8deg)}}
+
+/* ===== Keep the bottom-right corner free (the host "Manage app" button sits there) ===== */
+.pager,.npager{justify-content:center;gap:14px}
+.navbar{justify-content:center;gap:12px}
+.navbar>button:last-child{order:1}
+.navbar>span{order:2}
 </style></head><body>
 <header>
 <div class="topstrip"><span>Thursday, November 26, 2026</span><span>IFB Quiz Edition</span></div>
@@ -227,6 +233,7 @@ const DEFAULT_Q=[
 const TIE_Q=[
 ["What valuation range are public market investors estimating for Oravel Stays ahead of its proposed IPO?",["₹20,000–22,000 crore","₹15,000–17,000 crore","₹25,000–27,000 crore","₹30,000–32,000 crore"],0],
 ["Which US hospitality company did Oravel Stays acquire in December 2024?",["Choice Hotels","G6 Hospitality","Wyndham Hotels","Marriott International"],1]];
+const DEFAULT_TIE=JSON.parse(JSON.stringify(TIE_Q));
 const TIME=10; /* seconds per question: one single countdown */
 const UL=new Set(); /* questions unlocked this session */
 
@@ -279,6 +286,7 @@ function unlock(k){UL.add(/^\d+$/.test(k)?+k:k);render();startTimer()}
 const KEY="ifbtimes.v2";let S={q:DEFAULT_Q,ans:{},tieAns:{}},cur=0,tm=null,ac=null,tick=null;
 try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.q&&d.q.length==18)S=d}catch(e){}
 S.tieAns=S.tieAns||{};
+if(S.tie&&S.tie.length==TIE_Q.length)TIE_Q.splice(0,TIE_Q.length,...S.tie);
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const info=i=>({g:Math.floor(i/6),m:Math.floor(i%6/2),t:i%2?"Business Affairs":"International / Indian Politics"});
 const pts=(i)=>{const a=S.ans[i];if(a===undefined)return null;if(a===-1)return 0;return a===S.q[i][2]?20:0};
@@ -352,7 +360,7 @@ function render(){
  const tied=tiedGroups();
  if(cur>=S.q.length&&!tied.length)cur=0;
  $("dots").innerHTML=S.q.map((_,k)=>{const p=pts(k),aa=S.ans[k];return`<button class="${k==cur?"cur ":""}${p==20?"c":aa===undefined?"":aa===-1?"u":"w"}" onclick="go(${k})">${k+1}</button>`}).join("")+
- (tied.length?TIE_Q.map((_,k)=>`<button class="${S.q.length+k==cur?"cur ":""}${tied.every(g=>S.tieAns[`${g}:${k}`]!==undefined)?"c":""}" onclick="go(${S.q.length+k})">T${k+1}</button>`).join(""):"");
+ (tied.length?TIE_Q.map((_,k)=>`<button class="${S.q.length+k==cur?"cur ":""}${tied.every(g=>S.tieAns[`${g}:${k}`]!==undefined)?"c":""}" onclick="go(${S.q.length+k})">B${k+1}</button>`).join(""):"");
  if(cur>=S.q.length){renderTie(cur-S.q.length,tied);return}
  const i=cur,{g,m,t}=info(i),[q,o,c]=S.q[i],a=S.ans[i],done=a!==undefined,locked=!done&&!UL.has(i);
  const p=pts(i),wr=done&&a!==-1&&p===0;
@@ -360,16 +368,16 @@ function render(){
  ${locked?lockBox(i):`<h2 class="q">${esc(q)}</h2><div class="opts">${o.map((x,k)=>`<button class="opt ${done&&k==c?"right":""} ${done&&a==k&&k!=c?"wrong":""} ${a==k?"picked":""}" onclick="mark(${i},${k})"><b>${L[k]}</b>${esc(x)}</button>`).join("")}</div>`}
  <div class="bar"><div class="timer"><div id="clock">${TIME}</div><div id="phase">${locked?"Locked":"Ready"}</div>${locked?"":`<button class="btn pri" id="start" onclick="startTimer()">▶ Restart timer</button>`}</div>
  <div>${locked?"":`<button class="btn" onclick="mark(${i},-1)">Unanswered (0)</button>`} ${done?`<button class="btn" onclick="clr(${i})">Clear</button>`:""}</div></div>
- <div class="bar"><button class="btn" onclick="go(${i-1})" ${i==0?"disabled":""}>← Previous</button>
+ <div class="bar navbar"><button class="btn" onclick="go(${i-1})" ${i==0?"disabled":""}>← Previous</button>
  <span class="res ${p>0?"pos":wr?"neg":""}">${done?(p>0?"Correct +20":wr?"Wrong 0":"Unanswered 0")+" · "+GROUPS[g][1][m]:"Not marked yet"}</span>
  ${i==17&&!tied.length?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${i+1})">Next →</button>`}</div>`;
 }
 function renderTie(i,tied){
  const locked=!UL.has("t"+i);
- $("slide").innerHTML=`<div class="meta"><span class="pill">Tie-breaker ${i+1} / ${TIE_Q.length}</span><span class="pill">For tied groups: ${tied.map(g=>GROUPS[g][0]).join(", ")}</span></div>
+ $("slide").innerHTML=`<div class="meta"><span class="pill">Buffer question ${i+1} / ${TIE_Q.length} · tie-breaker</span><span class="pill">For tied groups: ${tied.map(g=>GROUPS[g][0]).join(", ")}</span></div>
  ${locked?lockBox("t"+i):`<h2 class="q">${esc(TIE_Q[i][0])}</h2><div class="tiewrap">${tied.map(g=>`<div class="tie-team" id="tie-team-${g}">${tieTeamContent(i,g)}</div>`).join("")}</div>`}
  <div class="bar"><div class="timer"><div id="clock">${TIME}</div><div id="phase">${locked?"Locked":"Ready"}</div>${locked?"":`<button class="btn pri" id="start" onclick="startTimer()">▶ Restart timer</button>`}</div><span class="res">Timer applies to all tied groups; tie-break points are separate.</span></div>
- <div class="bar"><button class="btn" onclick="go(${S.q.length+i-1})">← Previous</button><span></span>${i==TIE_Q.length-1?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${S.q.length+i+1})">Next →</button>`}</div>`;
+ <div class="bar navbar"><button class="btn" onclick="go(${S.q.length+i-1})">← Previous</button><span></span>${i==TIE_Q.length-1?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${S.q.length+i+1})">Next →</button>`}</div>`;
 }
 function tieTeamContent(i,g){const[q,o,c]=TIE_Q[i],a=S.tieAns[`${g}:${i}`],done=a!==undefined;return`<h3>${GROUPS[g][0]} · ${tiePoints(g)} correct</h3><div class="res" style="margin:0 0 6px;font-size:.8rem">⭐ MVP answers: ${teamMvp(g).map(esc).join(" / ")}</div><div class="opts">${o.map((x,k)=>`<button class="opt ${done&&k==c?"right":""} ${done&&a==k&&k!=c?"wrong":""} ${a==k?"picked":""}" onclick="markTie(${i},${g},${k})"><b>${L[k]}</b>${esc(x)}</button>`).join("")}</div>`}
 function go(k){const max=S.q.length+(tiedGroups().length?TIE_Q.length:0);if(k<0||k>=max)return;stopTimer();cur=k;render()}
@@ -439,10 +447,15 @@ function edit(){
  $("vE").innerHTML=`<p style="font-family:system-ui,sans-serif;font-size:.85rem;margin:0 0 8px">Edit the questions, options and the correct answer, then press Save. Order is fixed: for each member, Politics question then Business question.</p>`+
  S.q.map(([q,o,c],i)=>{const{g,m,t}=info(i);return`<div class="ed"><b>Q${i+1} · ${GROUPS[g][0]} · ${GROUPS[g][1][m]} · ${t}</b>
  <textarea rows="2" id="eq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="c${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="eo${i}_${k}" value="${esc(x)}"></label>`).join("")}</div>`}).join("")+
- `<button class="btn pri" onclick="saveEd()">Save changes</button> <button class="btn" onclick="if(confirm('Restore original questions?')){S.q=DEFAULT_Q;save();edit()}">Restore defaults</button>
+ `<p style="font-family:system-ui,sans-serif;font-size:.85rem;margin:14px 0 8px"><b>Buffer questions</b> – used only if teams are tied for the lead. Each tied team’s MVP answers them.</p>`+
+ TIE_Q.map(([q,o,c],i)=>`<div class="ed"><b>Buffer question ${i+1} · tie-breaker</b>
+ <textarea rows="2" id="bq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="bc${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="bo${i}_${k}" value="${esc(x)}"></label>`).join("")}</div>`).join("")+
+ `<button class="btn pri" onclick="saveEd()">Save changes</button> <button class="btn" onclick="if(confirm('Restore original questions?')){S.q=DEFAULT_Q;S.tie=null;TIE_Q.splice(0,TIE_Q.length,...DEFAULT_TIE);save();edit()}">Restore defaults</button>
  <button class="btn" onclick="exp()">Export JSON</button> <button class="btn" onclick="$('imp').click()">Import JSON</button><input id="imp" type="file" accept=".json" class="hide" onchange="imp(this)">`;
 }
-function saveEd(){S.q=S.q.map((_,i)=>[$("eq"+i).value,[0,1,2,3].map(k=>$(`eo${i}_${k}`).value),+document.querySelector(`input[name=c${i}]:checked`).value]);save();alert("Questions saved.")}
+function saveEd(){S.q=S.q.map((_,i)=>[$("eq"+i).value,[0,1,2,3].map(k=>$(`eo${i}_${k}`).value),+document.querySelector(`input[name=c${i}]:checked`).value]);
+ const nt=TIE_Q.map((_,i)=>[$("bq"+i).value,[0,1,2,3].map(k=>$(`bo${i}_${k}`).value),+document.querySelector(`input[name=bc${i}]:checked`).value]);
+ TIE_Q.splice(0,TIE_Q.length,...nt);S.tie=nt;save();alert("Questions saved.")}
 function exp(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S.q,null,1)],{type:"application/json"}));a.download="quiz-questions.json";a.click()}
 function imp(f){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.length!=18)throw 0;S.q=d;save();edit()}catch(e){alert("Invalid file: need 18 questions.")}};r.readAsText(f.files[0])}
 
