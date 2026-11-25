@@ -223,7 +223,8 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 .nfoot span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 
 /* ===== Edit news ===== */
-#vW{overflow:auto}
+#vW,#vG{overflow:auto}
+#sync{font-weight:800}#sync.ok{color:var(--ok)}#sync.bad{color:var(--bad)}
 .ed small{display:block;margin-top:8px;font-weight:700;color:var(--mut)}
 
 .nprev{display:block;max-width:240px;max-height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin:6px 0}
@@ -238,7 +239,7 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 <header>
 <div class="topstrip"><span>Thursday, November 26, 2026</span><span>IFB Quiz Edition</span></div>
 <h1 class="masthead">The IFB Times</h1>
-<nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tT"><i>3</i>Meet the Teams</button><button id="tQ"><i>4</i>Quiz</button><button id="tS"><i>5</i>Results</button><button id="tW">Edit News</button><button id="tE">Edit Questions</button></nav>
+<nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tT"><i>3</i>Meet the Teams</button><button id="tQ"><i>4</i>Quiz</button><button id="tS"><i>5</i>Results</button><button id="tW">Edit News</button><button id="tG">Edit Teams</button><button id="tE">Edit Questions</button></nav>
 <div class="ticker" aria-label="Set the customer free"><div class="tk" id="tk"></div></div>
 </header>
 <main>
@@ -248,6 +249,7 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 <section id="vQ" class="hide"><div id="dots"></div><div class="slide" id="slide"></div></section>
 <section id="vS" class="hide"></section>
 <section id="vW" class="hide"></section>
+<section id="vG" class="hide"></section>
 <section id="vE" class="hide"></section>
 </main>
 <script>
@@ -368,12 +370,18 @@ const lockBox=k=>`<div class="lockbox"><div><div class="lockic">🔒</div><p>Thi
 function unlock(k){UL.add(/^\d+$/.test(k)?+k:k);render();startTimer()}
 const KEY="ifbtimes.v2";let S={q:DEFAULT_Q,ans:{},tieAns:{}},cur=0,tm=null,ac=null,tick=null;
 try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.q&&d.q.length==18)S=d}catch(e){}
+function teamsSnap(){return{g:GROUPS.map(([n,m])=>[n,[...m]]),i:TEAM_INFO.map(t=>({tag:t.tag,prod:t.prod}))}}
+function applyTeams(t){if(!t||!t.g||t.g.length!=GROUPS.length)return;t.g.forEach((r,g)=>{GROUPS[g][0]=r[0];r[1].forEach((m,k)=>{GROUPS[g][1][k]=m})});(t.i||[]).forEach((r,g)=>{if(r.tag!=null)TEAM_INFO[g].tag=r.tag;if(r.prod!=null)TEAM_INFO[g].prod=r.prod})}
+/* Data saved into this file (use "Download updated index.html" in the Edit tabs). Replaces older data saved in a browser. */
+const BAKED=/*B1*/null/*B2*/;
+if(BAKED&&S.bakedV!==BAKED.v)S={q:BAKED.q,tie:BAKED.tie,news:BAKED.news,teams:BAKED.teams,ans:{},tieAns:{},bakedV:BAKED.v};
+if(S.teams)applyTeams(S.teams);
 S.tieAns=S.tieAns||{};
 if(S.tie&&S.tie.length==TIE_Q.length){S.tie.forEach((r,i)=>{if(r[3]===undefined)r[3]=TIE_FOOT[i]||""});TIE_Q.splice(0,TIE_Q.length,...S.tie)}
 S.q.forEach((r,i)=>{if(r[3]===undefined)r[3]=DEFAULT_FOOT[i]||""});
 const DEFAULT_NEWS=JSON.parse(JSON.stringify(NEWS));
 if(S.news&&S.news.length==NEWS.length)S.news.forEach((n,i)=>Object.assign(NEWS[i],n));
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const save=()=>{S.teams=teamsSnap();try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const info=i=>({g:Math.floor(i/6),m:Math.floor(i%6/2),t:i%2?"Business Affairs":"International / Indian Politics"});
 const pts=(i)=>{const a=S.ans[i];if(a===undefined)return null;if(a===-1)return 0;return a===S.q[i][2]?20:0};
 function groupTotals(){return GROUPS.map((_,g)=>{let total=0;for(let i=g*6;i<g*6+6;i++){const p=pts(i);if(p!==null)total+=p}return total})}
@@ -555,7 +563,7 @@ function edit(){
  <textarea rows="2" id="bq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="bc${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="bo${i}_${k}" value="${esc(x)}"></label>`).join("")}
  <small>Footer · further detail, shown after the answer is marked (1–2 lines)</small><input type="text" id="bf${i}" maxlength="200" value="${esc(f||"")}"></div>`).join("")+
  `<button class="btn pri" onclick="saveEd()">Save changes</button> <button class="btn" onclick="if(confirm('Restore original questions?')){S.q=DEFAULT_Q;S.tie=null;TIE_Q.splice(0,TIE_Q.length,...DEFAULT_TIE);save();edit()}">Restore defaults</button>
- <button class="btn" onclick="exp()">Export JSON</button> <button class="btn" onclick="$('imp').click()">Import JSON</button><input id="imp" type="file" accept=".json" class="hide" onchange="imp(this)">`;
+ <button class="btn" onclick="exp()">Export JSON</button> <button class="btn" onclick="$('imp').click()">Import JSON</button><input id="imp" type="file" accept=".json" class="hide" onchange="imp(this)">`+DLBTN;
 }
 function saveEd(){S.q=S.q.map((_,i)=>[$("eq"+i).value,[0,1,2,3].map(k=>$(`eo${i}_${k}`).value),+document.querySelector(`input[name=c${i}]:checked`).value,$("ef"+i).value.trim()]);
  const nt=TIE_Q.map((_,i)=>[$("bq"+i).value,[0,1,2,3].map(k=>$(`bo${i}_${k}`).value),+document.querySelector(`input[name=bc${i}]:checked`).value,$("bf"+i).value.trim()]);
@@ -587,17 +595,46 @@ function newsEdit(){
  <small>Photo (optional – choose from your device; without one the illustration is shown)</small>
  <img id="np${i}" class="nprev${a.img?"":" hide"}" alt="Selected photo" src="${a.img?esc(a.img):""}">
  <div class="phrow"><input type="file" accept="image/*" id="nf${i}" onchange="pickPhoto(${i},this)"><button class="btn" onclick="clearPhoto(${i})">Remove photo</button></div></div>`).join("")+
- `<button class="btn pri" onclick="saveNews()">Save news</button> <button class="btn" onclick="if(confirm('Restore the original news pages?')){NEWS.forEach((a,i)=>{delete a.img;Object.assign(a,DEFAULT_NEWS[i])});S.news=null;save();newsEdit()}">Restore defaults</button>`;
+ `<button class="btn pri" onclick="saveNews()">Save news</button> <button class="btn" onclick="if(confirm('Restore the original news pages?')){NEWS.forEach((a,i)=>{delete a.img;Object.assign(a,DEFAULT_NEWS[i])});S.news=null;save();newsEdit()}">Restore defaults</button>`+DLBTN;
 }
 function saveNews(){
  NEWS.forEach((a,i)=>{a.title=$("nt"+i).value;a.source=$("ns"+i).value;a.date=$("nd"+i).value;a.body=$("nb"+i).value;if(NP[i]!==undefined){if(NP[i])a.img=NP[i];else delete a.img}});
  S.news=NEWS.map(({title,source,date,body,img})=>({title,source,date,body,img}));Object.keys(NP).forEach(k=>delete NP[k]);
- try{localStorage.setItem(KEY,JSON.stringify(S));alert("News saved.")}catch(e){alert("News updated for now, but the photos are too large to keep after closing. Try smaller photos.")}}
+ S.teams=teamsSnap();try{localStorage.setItem(KEY,JSON.stringify(S));alert("News saved.")}catch(e){alert("News updated for now, but the photos are too large to keep after closing. Try smaller photos.")}}
 
 /* ===================== TABS ===================== */
-function tab(t){stopTimer();["N","R","T","Q","S","E","W"].forEach(k=>{$("v"+k).classList.toggle("hide",k!=t);$("t"+k).classList.toggle("on",k==t)});
- if(t=="N")newsView();if(t=="R")rulesView();if(t=="T")teamsView();if(t=="Q")render();if(t=="S")score();if(t=="E")edit();if(t=="W")newsEdit()}
-["N","R","T","Q","S","E","W"].forEach(k=>$("t"+k).onclick=()=>tab(k));
+let curTab="N";function tab(t){curTab=t;stopTimer();["N","R","T","Q","S","E","W","G"].forEach(k=>{$("v"+k).classList.toggle("hide",k!=t);$("t"+k).classList.toggle("on",k==t)});
+ if(t=="N")newsView();if(t=="R")rulesView();if(t=="T")teamsView();if(t=="Q")render();if(t=="S")score();if(t=="E")edit();if(t=="W")newsEdit();if(t=="G")teamsEdit()}
+["N","R","T","Q","S","E","W","G"].forEach(k=>$("t"+k).onclick=()=>tab(k));
 document.addEventListener("keydown",e=>{if($("vQ").classList.contains("hide")||/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key=="Enter"){const b=document.querySelector(".lockbox .btn");if(b)b.click()}if(e.key=="ArrowRight")go(cur+1);if(e.key=="ArrowLeft")go(cur-1)});
+/* ===================== SAVE EVERYTHING INTO THE FILE ===================== */
+async function dlSite(){
+ let src;
+ try{const r=await fetch(location.href.split("#")[0].split("?")[0],{cache:"no-store"});if(!r.ok)throw 0;src=await r.text()}
+ catch(e){alert("Please open the website from its https:// link (for example your GitHub Pages address) and try again. This does not work from a file on your computer.");return}
+ const re=/\/\*B1\*\/[\s\S]*?\/\*B2\*\//;
+ if(!re.test(src)){alert("Could not find the data block in the page.");return}
+ const data={v:Date.now(),q:S.q,tie:TIE_Q,teams:teamsSnap(),news:NEWS.map(({title,source,date,body,img})=>({title,source,date,body,img:img||""}))};
+ const json=JSON.stringify(data).replace(/</g,"\\u003c");
+ src=src.replace(re,()=>"/*B1*/"+json+"/*B2*/");
+ const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([src],{type:"text/html"}));a.download="index.html";a.click();
+ alert("Downloaded. Upload this index.html to GitHub (replace the old one) to publish your changes for everyone.")}
+const DLBTN=`<div class="ed" style="border-left:4px solid var(--acc)"><b>Publish your changes</b><p style="margin:6px 0">Edits are saved only in this browser until you put them into the website file. When you are done editing everything, click below and upload the downloaded <b>index.html</b> to GitHub.</p><button class="btn pri" onclick="dlSite()">⬇ Download updated index.html</button></div>`;
+
+/* ===================== EDIT TEAMS ===================== */
+function teamsEdit(){
+ $("vG").innerHTML=`<p style="font-family:system-ui,sans-serif;font-size:.85rem;margin:0 0 8px">Edit team names, slogans and member names. Members answer in the order shown (their two questions follow the list order).</p>`+
+ GROUPS.map(([gn,ms],g)=>`<div class="ed"><b>Team ${g+1}</b>
+ <small>Team name</small><input type="text" id="gn${g}" value="${esc(gn)}">
+ <small>Slogan</small><input type="text" id="gt${g}" value="${esc(TEAM_INFO[g].tag)}">
+ <small>Product line (after “Powered by IFB Essentials ·”)</small><input type="text" id="gp${g}" value="${esc(TEAM_INFO[g].prod)}">
+ ${ms.map((n,m)=>`<small>Member ${m+1}</small><input type="text" id="gm${g}_${m}" value="${esc(n)}">`).join("")}</div>`).join("")+
+ `<button class="btn pri" onclick="saveTeams()">Save teams</button>`+DLBTN;
+}
+function saveTeams(){
+ GROUPS.forEach((gr,g)=>{gr[0]=$("gn"+g).value.trim()||gr[0];gr[1].forEach((_,m)=>{gr[1][m]=$(`gm${g}_${m}`).value.trim()||gr[1][m]});
+  TEAM_INFO[g].tag=$("gt"+g).value;TEAM_INFO[g].prod=$("gp"+g).value});
+ save();alert("Teams saved.")}
+
 tab("N");
 </script></body></html>
