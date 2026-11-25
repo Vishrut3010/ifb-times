@@ -211,11 +211,23 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 @keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
 @media(max-width:700px){.roster{grid-template-columns:1fr;gap:10px}.pcard{flex-direction:row;justify-content:flex-start;gap:12px;text-align:left;padding:10px 14px}.pcard h3{margin:0}}
 @media(prefers-reduced-motion:reduce){.pop,.mystery{animation:none!important}}
+
+/* ===== News footer: crisp further detail (max 2 lines) ===== */
+.nfoot{flex:none;display:flex;gap:12px;align-items:baseline;background:var(--tint);border-radius:10px;padding:8px 14px;margin-top:4px;font:600 .88rem/1.4 system-ui,sans-serif;color:var(--ink)}
+.nfoot b{flex:none;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
+.nfoot span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+/* ===== Edit news ===== */
+#vW{overflow:auto}
+.ed small{display:block;margin-top:8px;font-weight:700;color:var(--mut)}
+
+.nprev{display:block;max-width:240px;max-height:150px;object-fit:cover;border-radius:10px;border:1px solid var(--line);margin:6px 0}
+.phrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:4px}
 </style></head><body>
 <header>
 <div class="topstrip"><span>Thursday, November 26, 2026</span><span>IFB Quiz Edition</span></div>
 <h1 class="masthead">The IFB Times</h1>
-<nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tT"><i>3</i>Meet the Teams</button><button id="tQ"><i>4</i>Quiz</button><button id="tS"><i>5</i>Results</button><button id="tE">Edit Questions</button></nav>
+<nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tT"><i>3</i>Meet the Teams</button><button id="tQ"><i>4</i>Quiz</button><button id="tS"><i>5</i>Results</button><button id="tW">Edit News</button><button id="tE">Edit Questions</button></nav>
 <div class="ticker" aria-label="Set the customer free"><div class="tk" id="tk"></div></div>
 </header>
 <main>
@@ -224,6 +236,7 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 <section id="vT" class="hide"></section>
 <section id="vQ" class="hide"><div id="dots"></div><div class="slide" id="slide"></div></section>
 <section id="vS" class="hide"></section>
+<section id="vW" class="hide"></section>
 <section id="vE" class="hide"></section>
 </main>
 <script>
@@ -261,6 +274,10 @@ const DEFAULT_Q=[
 const TIE_Q=[
 ["What valuation range are public market investors estimating for Oravel Stays ahead of its proposed IPO?",["₹20,000–22,000 crore","₹15,000–17,000 crore","₹25,000–27,000 crore","₹30,000–32,000 crore"],0],
 ["Which US hospitality company did Oravel Stays acquire in December 2024?",["Choice Hotels","G6 Hospitality","Wyndham Hotels","Marriott International"],1]];
+const DEFAULT_FOOT=["Balen Shah, Nepal’s Prime Minister, made India the destination of his maiden bilateral trip abroad.", "Mahindra Finance is weighing an expansion into gold finance through acquisitions.", "The inaugural SCO Civilisational Forum was held at Purana Quila in Delhi.", "Tata Play is in talks to sell its broadband business to Atria Convergence Technologies (ACT).", "The long-term agreement lets India import up to 10,000 MW of power from Nepal over 10 years.", "Tata Play is seeking ₹1,500 crore for its broadband business.", "India and Belarus plan deeper industrial and defence ties, with drones in focus alongside agriculture machinery.", "Oravel (Oyo) reported a net profit of ₹994 crore in FY26.", "The Siang Upper Multipurpose Project in Arunachal Pradesh is planned at 11,000 MW and faces local opposition.", "Oyo is eyeing an IPO in Q4 at a valuation of about $2.3 billion.", "CJI Surya Kant said citizens may criticise decisions but should not target institutions.", "Pernod Ricard’s board may meet in India in January to discuss a potential IPO.", "Musadik Malik represented Pakistan at the SCO Civilisational Forum in Delhi.", "CII proposed allowing up to 49% foreign investment in state-run banks.", "S Jaishankar called on Nepal PM Balen Shah on Sunday.", "FPIs have been net buyers of Indian equities for 13 consecutive sessions.", "VVP stands for the Vibrant Villages Programme; Arunachal border villages saw their population rise, per Amit Shah.", "Coca-Cola is bringing back Gold Spot after 26 years."];
+const TIE_FOOT=["Public market investors estimate Oravel Stays at ₹20,000–22,000 crore ahead of its proposed IPO.", "Oravel Stays acquired the US hospitality company G6 Hospitality in December 2024."];
+DEFAULT_Q.forEach((r,i)=>{r[3]=DEFAULT_FOOT[i]});
+TIE_Q.forEach((r,i)=>{r[3]=TIE_FOOT[i]});
 const DEFAULT_TIE=JSON.parse(JSON.stringify(TIE_Q));
 const TIME=10; /* seconds per question: one single countdown */
 const UL=new Set(); /* questions unlocked this session */
@@ -297,32 +314,30 @@ function newsView(){
 
 
 /* ===================== MEET THE TEAMS (intro show) ===================== */
-let tI=0,tSt=0,tBusy=false; /* tSt: 0 hidden, 1 team revealed, 2-4 players 1-3 revealed */
+let tI=0,tSt=0,tBusy=false; /* tSt: 0 = members shown, team name hidden; 1 = team name launched */
 function tone(f,t,d,type="triangle",v=.2){const a=actx(),o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;const t0=a.currentTime+t;g.gain.setValueAtTime(.001,t0);g.gain.linearRampToValueAtTime(v,t0+.02);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g);g.connect(a.destination);o.start(t0);o.stop(t0+d+.05)}
 function drumroll(){try{for(let i=0;i<24;i++)tone(105+Math.random()*25,i*.045,.09,"sine",.08+i*.012);
  [[523,1.1],[659,1.2],[784,1.3]].forEach(([f,t])=>tone(f,t,.35,"triangle",.22));tone(1047,1.42,.9,"triangle",.25);tone(523,1.42,.9,"sawtooth",.06);tone(784,1.42,.9,"triangle",.12)}catch(e){}}
 function chime(){try{tone(880,0,.18,"triangle",.2);tone(1319,.1,.35,"triangle",.2)}catch(e){}}
 function teamsView(){
  const g=tI,[gn,ms]=GROUPS[g],ti=TEAM_INFO[g],st=tSt,lastTeam=g==GROUPS.length-1;
- const label=st==0?"🥁 Reveal the team":st<4?`🎤 Reveal player ${st}`:(lastTeam?"Start the quiz →":"Next team →");
- const head=st>=1?`<div class="tbadge${st==1?" pop":""}">${ti.ic}</div><h2 class="tname${st==1?" pop":""}">${esc(gn)}</h2><p class="ttag">${esc(ti.tag)}</p><p class="tprod">Powered by IFB Essentials · ${esc(ti.prod)}</p>`
-  :`<div class="tbadge mystery">❓</div><h2 class="tname">Introducing…</h2><p class="ttag">Team ${g+1} of ${GROUPS.length}</p>`;
+ const label=st==0?"🥁 Launch the team name":(lastTeam?"Start the quiz →":"Next team →");
+ const head=st>=1?`<div class="tbadge pop">${ti.ic}</div><h2 class="tname pop">${esc(gn)}</h2><p class="ttag">${esc(ti.tag)}</p><p class="tprod">Powered by IFB Essentials · ${esc(ti.prod)}</p>`
+  :`<div class="tbadge mystery">❓</div><h2 class="tname">Introducing…</h2><p class="ttag">Team ${g+1} of ${GROUPS.length} · name coming up</p>`;
  const cards=ms.map((n,m)=>{const q1=g*6+m*2+1;
-  return st>=m+2?`<div class="pcard${st==m+2?" pop":""}"><div class="jersey">${ti.jer[m]}</div><h3>${esc(n)}</h3><p>Answers Q${q1} &amp; Q${q1+1}</p></div>`
-  :`<div class="pcard hidden"><div class="jersey">?</div><h3>Player ${m+1}</h3><p>&nbsp;</p></div>`}).join("");
+  return`<div class="pcard"><div class="jersey">${ti.jer[m]}</div><h3>${esc(n)}</h3><p>Answers Q${q1} &amp; Q${q1+1}</p></div>`}).join("");
  $("vT").innerHTML=`<div class="sechead"><span>Meet the Teams</span><span>Team ${g+1} of ${GROUPS.length}</span></div>
  <div class="tstage" style="--tc:${ti.c}">${head}<div class="roster">${cards}</div></div>
  <div class="pager"><button class="btn" onclick="teamBack()" ${g==0&&st==0?"disabled":""}>← Back</button>
  <button class="btn pri" onclick="teamNext()">${label}</button>
  <button class="btn" onclick="tI=0;tSt=0;teamsView()">↺ Restart intro</button></div>`;
 }
-function teamBack(){if(tBusy)return;if(tSt>0)tSt--;else if(tI>0){tI--;tSt=4}teamsView()}
+function teamBack(){if(tBusy)return;if(tSt>0)tSt=0;else if(tI>0){tI--;tSt=1}teamsView()}
 function teamNext(){
  if(tBusy)return;
- if(tSt==4){if(tI==GROUPS.length-1){tab("Q");return}tI++;tSt=0;teamsView();return}
- tBusy=true;const first=tSt==0;
- if(first)drumroll();else chime();
- setTimeout(()=>{tSt++;tBusy=false;teamsView();if(first)party("vT")},first?1250:350)}
+ if(tSt==1){if(tI==GROUPS.length-1){tab("Q");return}tI++;tSt=0;teamsView();return}
+ tBusy=true;drumroll();
+ setTimeout(()=>{tSt=1;tBusy=false;teamsView();party("vT")},1250)}
 
 /* ===================== 2. RULES ===================== */
 function rulesView(){
@@ -343,7 +358,10 @@ function unlock(k){UL.add(/^\d+$/.test(k)?+k:k);render();startTimer()}
 const KEY="ifbtimes.v2";let S={q:DEFAULT_Q,ans:{},tieAns:{}},cur=0,tm=null,ac=null,tick=null;
 try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.q&&d.q.length==18)S=d}catch(e){}
 S.tieAns=S.tieAns||{};
-if(S.tie&&S.tie.length==TIE_Q.length)TIE_Q.splice(0,TIE_Q.length,...S.tie);
+if(S.tie&&S.tie.length==TIE_Q.length){S.tie.forEach((r,i)=>{if(r[3]===undefined)r[3]=TIE_FOOT[i]||""});TIE_Q.splice(0,TIE_Q.length,...S.tie)}
+S.q.forEach((r,i)=>{if(r[3]===undefined)r[3]=DEFAULT_FOOT[i]||""});
+const DEFAULT_NEWS=JSON.parse(JSON.stringify(NEWS));
+if(S.news&&S.news.length==NEWS.length)S.news.forEach((n,i)=>Object.assign(NEWS[i],n));
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const info=i=>({g:Math.floor(i/6),m:Math.floor(i%6/2),t:i%2?"Business Affairs":"International / Indian Politics"});
 const pts=(i)=>{const a=S.ans[i];if(a===undefined)return null;if(a===-1)return 0;return a===S.q[i][2]?20:0};
@@ -427,6 +445,8 @@ function startTimer(){
 }
 function mark(i,v){const priorTie=tiedGroups().join(",");S.ans[i]=v;if(priorTie!==tiedGroups().join(","))S.tieAns={};save();stopTimer();render()}
 
+function quizFoot(i){const f=S.q[i][3];return f&&S.ans[i]!==undefined?`<div class="nfoot"><b>Further detail</b><span>${esc(f)}</span></div>`:""}
+function tieFoot(i,tied){const f=TIE_Q[i][3];return f&&tied.length&&tied.every(g=>S.tieAns[`${g}:${i}`]!==undefined)?`<div class="nfoot"><b>Further detail</b><span>${esc(f)}</span></div>`:""}
 function render(){
  const tied=tiedGroups();
  if(cur>=S.q.length&&!tied.length)cur=0;
@@ -441,19 +461,19 @@ function render(){
  <div>${locked?"":`<button class="btn" onclick="mark(${i},-1)">Unanswered (0)</button>`} ${done?`<button class="btn" onclick="clr(${i})">Clear</button>`:""}</div></div>
  <div class="bar navbar"><button class="btn" onclick="go(${i-1})" ${i==0?"disabled":""}>← Previous</button>
  <span class="res ${p>0?"pos":wr?"neg":""}">${done?(p>0?"Correct +20":wr?"Wrong 0":"Unanswered 0")+" · "+GROUPS[g][1][m]:"Not marked yet"}</span>
- ${i==17&&!tied.length?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${i+1})">Next →</button>`}</div>`;
+ ${i==17&&!tied.length?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${i+1})">Next →</button>`}</div><div id="qfoot">${quizFoot(i)}</div>`;
 }
 function renderTie(i,tied){
  const locked=!UL.has("t"+i);
  $("slide").innerHTML=`<div class="meta"><span class="pill">Buffer question ${i+1} / ${TIE_Q.length} · tie-breaker</span><span class="pill">For tied groups: ${tied.map(g=>GROUPS[g][0]).join(", ")}</span></div>
  ${locked?lockBox("t"+i):`<h2 class="q">${esc(TIE_Q[i][0])}</h2><div class="tiewrap">${tied.map(g=>`<div class="tie-team" id="tie-team-${g}">${tieTeamContent(i,g)}</div>`).join("")}</div>`}
  <div class="bar"><div class="timer"><div id="clock">${TIME}</div><div id="phase">${locked?"Locked":"Ready"}</div>${locked?"":`<button class="btn pri" id="start" onclick="startTimer()">▶ Restart timer</button>`}</div><span class="res">Timer applies to all tied groups; tie-break points are separate.</span></div>
- <div class="bar navbar"><button class="btn" onclick="go(${S.q.length+i-1})">← Previous</button><span></span>${i==TIE_Q.length-1?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${S.q.length+i+1})">Next →</button>`}</div>`;
+ <div class="bar navbar"><button class="btn" onclick="go(${S.q.length+i-1})">← Previous</button><span></span>${i==TIE_Q.length-1?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${S.q.length+i+1})">Next →</button>`}</div><div id="qfoot">${tieFoot(i,tied)}</div>`;
 }
 function tieTeamContent(i,g){const[q,o,c]=TIE_Q[i],a=S.tieAns[`${g}:${i}`],done=a!==undefined;return`<h3>${GROUPS[g][0]} · ${tiePoints(g)} correct</h3><div class="res" style="margin:0 0 6px;font-size:.8rem">⭐ MVP answers: ${teamMvp(g).map(esc).join(" / ")}</div><div class="opts">${o.map((x,k)=>`<button class="opt ${done&&k==c?"right":""} ${done&&a==k&&k!=c?"wrong":""} ${a==k?"picked":""}" onclick="markTie(${i},${g},${k})"><b>${L[k]}</b>${esc(x)}</button>`).join("")}</div>`}
 function go(k){const max=S.q.length+(tiedGroups().length?TIE_Q.length:0);if(k<0||k>=max)return;stopTimer();cur=k;render()}
 function clr(i){const priorTie=tiedGroups().join(",");delete S.ans[i];if(priorTie!==tiedGroups().join(","))S.tieAns={};save();render()}
-function markTie(i,g,a){S.tieAns[`${g}:${i}`]=a;save();$(`tie-team-${g}`).innerHTML=tieTeamContent(i,g);const dot=$("dots").children[S.q.length+i];dot.classList.toggle("c",tiedGroups().every(group=>S.tieAns[`${group}:${i}`]!==undefined))}
+function markTie(i,g,a){S.tieAns[`${g}:${i}`]=a;save();$(`tie-team-${g}`).innerHTML=tieTeamContent(i,g);$("qfoot").innerHTML=tieFoot(i,tiedGroups());const dot=$("dots").children[S.q.length+i];dot.classList.toggle("c",tiedGroups().every(group=>S.tieAns[`${group}:${i}`]!==undefined))}
 
 /* ===================== 4. RESULTS ===================== */
 function score(){
@@ -516,24 +536,57 @@ function dlPdf(){
 /* ===================== EDIT QUESTIONS ===================== */
 function edit(){
  $("vE").innerHTML=`<p style="font-family:system-ui,sans-serif;font-size:.85rem;margin:0 0 8px">Edit the questions, options and the correct answer, then press Save. Order is fixed: for each member, Politics question then Business question.</p>`+
- S.q.map(([q,o,c],i)=>{const{g,m,t}=info(i);return`<div class="ed"><b>Q${i+1} · ${GROUPS[g][0]} · ${GROUPS[g][1][m]} · ${t}</b>
- <textarea rows="2" id="eq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="c${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="eo${i}_${k}" value="${esc(x)}"></label>`).join("")}</div>`}).join("")+
+ S.q.map(([q,o,c,f],i)=>{const{g,m,t}=info(i);return`<div class="ed"><b>Q${i+1} · ${GROUPS[g][0]} · ${GROUPS[g][1][m]} · ${t}</b>
+ <textarea rows="2" id="eq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="c${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="eo${i}_${k}" value="${esc(x)}"></label>`).join("")}
+ <small>Footer · further detail, shown after the answer is marked (1–2 lines)</small><input type="text" id="ef${i}" maxlength="200" value="${esc(f||"")}"></div>`}).join("")+
  `<p style="font-family:system-ui,sans-serif;font-size:.85rem;margin:14px 0 8px"><b>Buffer questions</b> – used only if teams are tied for the lead. Each tied team’s MVP answers them.</p>`+
- TIE_Q.map(([q,o,c],i)=>`<div class="ed"><b>Buffer question ${i+1} · tie-breaker</b>
- <textarea rows="2" id="bq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="bc${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="bo${i}_${k}" value="${esc(x)}"></label>`).join("")}</div>`).join("")+
+ TIE_Q.map(([q,o,c,f],i)=>`<div class="ed"><b>Buffer question ${i+1} · tie-breaker</b>
+ <textarea rows="2" id="bq${i}">${esc(q)}</textarea>${o.map((x,k)=>`<label><input type="radio" name="bc${i}" value="${k}" ${k==c?"checked":""}><input type="text" id="bo${i}_${k}" value="${esc(x)}"></label>`).join("")}
+ <small>Footer · further detail, shown after the answer is marked (1–2 lines)</small><input type="text" id="bf${i}" maxlength="200" value="${esc(f||"")}"></div>`).join("")+
  `<button class="btn pri" onclick="saveEd()">Save changes</button> <button class="btn" onclick="if(confirm('Restore original questions?')){S.q=DEFAULT_Q;S.tie=null;TIE_Q.splice(0,TIE_Q.length,...DEFAULT_TIE);save();edit()}">Restore defaults</button>
  <button class="btn" onclick="exp()">Export JSON</button> <button class="btn" onclick="$('imp').click()">Import JSON</button><input id="imp" type="file" accept=".json" class="hide" onchange="imp(this)">`;
 }
-function saveEd(){S.q=S.q.map((_,i)=>[$("eq"+i).value,[0,1,2,3].map(k=>$(`eo${i}_${k}`).value),+document.querySelector(`input[name=c${i}]:checked`).value]);
- const nt=TIE_Q.map((_,i)=>[$("bq"+i).value,[0,1,2,3].map(k=>$(`bo${i}_${k}`).value),+document.querySelector(`input[name=bc${i}]:checked`).value]);
+function saveEd(){S.q=S.q.map((_,i)=>[$("eq"+i).value,[0,1,2,3].map(k=>$(`eo${i}_${k}`).value),+document.querySelector(`input[name=c${i}]:checked`).value,$("ef"+i).value.trim()]);
+ const nt=TIE_Q.map((_,i)=>[$("bq"+i).value,[0,1,2,3].map(k=>$(`bo${i}_${k}`).value),+document.querySelector(`input[name=bc${i}]:checked`).value,$("bf"+i).value.trim()]);
  TIE_Q.splice(0,TIE_Q.length,...nt);S.tie=nt;save();alert("Questions saved.")}
 function exp(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S.q,null,1)],{type:"application/json"}));a.download="quiz-questions.json";a.click()}
 function imp(f){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.length!=18)throw 0;S.q=d;save();edit()}catch(e){alert("Invalid file: need 18 questions.")}};r.readAsText(f.files[0])}
 
+/* ===================== EDIT NEWS ===================== */
+const NP={}; /* photos chosen but not saved yet */
+function pickPhoto(i,inp){
+ const f=inp.files&&inp.files[0];if(!f)return;
+ if(!/^image\//.test(f.type)){alert("Please choose an image file.");inp.value="";return}
+ const r=new FileReader();
+ r.onload=()=>{const im=new Image();
+  im.onload=()=>{const k=Math.min(1,1200/Math.max(im.width,im.height)),c=document.createElement("canvas");
+   c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+   NP[i]=c.toDataURL("image/jpeg",.85);const pv=$("np"+i);pv.src=NP[i];pv.classList.remove("hide")};
+  im.onerror=()=>alert("Could not read that image.");im.src=r.result};
+ r.readAsDataURL(f)}
+function clearPhoto(i){NP[i]="";const pv=$("np"+i);pv.removeAttribute("src");pv.classList.add("hide");$("nf"+i).value=""}
+function newsEdit(){
+ Object.keys(NP).forEach(k=>delete NP[k]);
+ $("vW").innerHTML=`<p style="font-family:system-ui,sans-serif;font-size:.85rem;margin:0 0 8px">Edit the three news pages. A blank line in the story starts a new paragraph.</p>`+
+ NEWS.map((a,i)=>`<div class="ed"><b>Page ${i+1} · ${esc(a.cat)}</b>
+ <small>Headline</small><input type="text" id="nt${i}" value="${esc(a.title)}">
+ <small>Source</small><input type="text" id="ns${i}" value="${esc(a.source||"")}">
+ <small>Date</small><input type="text" id="nd${i}" value="${esc(a.date||"")}">
+ <small>Story</small><textarea rows="8" id="nb${i}">${esc(a.body)}</textarea>
+ <small>Photo (optional – choose from your device; without one the illustration is shown)</small>
+ <img id="np${i}" class="nprev${a.img?"":" hide"}" alt="Selected photo" src="${a.img?esc(a.img):""}">
+ <div class="phrow"><input type="file" accept="image/*" id="nf${i}" onchange="pickPhoto(${i},this)"><button class="btn" onclick="clearPhoto(${i})">Remove photo</button></div></div>`).join("")+
+ `<button class="btn pri" onclick="saveNews()">Save news</button> <button class="btn" onclick="if(confirm('Restore the original news pages?')){NEWS.forEach((a,i)=>{delete a.img;Object.assign(a,DEFAULT_NEWS[i])});S.news=null;save();newsEdit()}">Restore defaults</button>`;
+}
+function saveNews(){
+ NEWS.forEach((a,i)=>{a.title=$("nt"+i).value;a.source=$("ns"+i).value;a.date=$("nd"+i).value;a.body=$("nb"+i).value;if(NP[i]!==undefined){if(NP[i])a.img=NP[i];else delete a.img}});
+ S.news=NEWS.map(({title,source,date,body,img})=>({title,source,date,body,img}));Object.keys(NP).forEach(k=>delete NP[k]);
+ try{localStorage.setItem(KEY,JSON.stringify(S));alert("News saved.")}catch(e){alert("News updated for now, but the photos are too large to keep after closing. Try smaller photos.")}}
+
 /* ===================== TABS ===================== */
-function tab(t){stopTimer();["N","R","T","Q","S","E"].forEach(k=>{$("v"+k).classList.toggle("hide",k!=t);$("t"+k).classList.toggle("on",k==t)});
- if(t=="N")newsView();if(t=="R")rulesView();if(t=="T")teamsView();if(t=="Q")render();if(t=="S")score();if(t=="E")edit()}
-["N","R","T","Q","S","E"].forEach(k=>$("t"+k).onclick=()=>tab(k));
+function tab(t){stopTimer();["N","R","T","Q","S","E","W"].forEach(k=>{$("v"+k).classList.toggle("hide",k!=t);$("t"+k).classList.toggle("on",k==t)});
+ if(t=="N")newsView();if(t=="R")rulesView();if(t=="T")teamsView();if(t=="Q")render();if(t=="S")score();if(t=="E")edit();if(t=="W")newsEdit()}
+["N","R","T","Q","S","E","W"].forEach(k=>$("t"+k).onclick=()=>tab(k));
 document.addEventListener("keydown",e=>{if($("vQ").classList.contains("hide")||/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key=="Enter"){const b=document.querySelector(".lockbox .btn");if(b)b.click()}if(e.key=="ArrowRight")go(cur+1);if(e.key=="ArrowLeft")go(cur-1)});
 tab("N");
 </script></body></html>
