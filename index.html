@@ -2,74 +2,82 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>The IFB Times</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@900&display=swap" rel="stylesheet">
 <style>
 /* ===== Palette: newsprint, inspired by The Hindu ===== */
-:root{--bg:#fbfaf6;--card:#ffffff;--ink:#141414;--mut:#5b5b5b;--line:#d6d2c8;--tint:#f0ede4;--acc:#0e4d8c;--on-acc:#ffffff;--ok:#1f7a3a;--bad:#b3261e;--amb:#a86400}
+:root{--bg:#fbfaf6;--card:#ffffff;--ink:#141414;--mut:#3f3f3f;--line:#d6d2c8;--tint:#f0ede4;--acc:#0e4d8c;--on-acc:#ffffff;--ok:#1f7a3a;--bad:#b3261e;--amb:#a86400}
 *{box-sizing:border-box}
-html{font-size:14px}
+html{font-size:15px}
 html,body{height:100%;margin:0;overflow:hidden}
 body{height:100dvh;display:flex;flex-direction:column;background:var(--bg);color:var(--ink);font-family:Georgia,'Times New Roman',serif}
 .hide{display:none!important}
 
 /* ===== Masthead ===== */
 header{flex:none;text-align:center;background:var(--card);border-bottom:1px solid var(--line)}
-.topstrip{display:flex;justify-content:space-between;max-width:1200px;margin:0 auto;padding:3px 16px;font:600 .62rem system-ui,sans-serif;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--line)}
-h1.masthead{margin:0;padding:2px 0 0;font-family:'UnifrakturCook','Old English Text MT','Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(1.8rem,6.4vh,2.7rem);line-height:1.1;color:var(--ink)}
+.topstrip{display:flex;justify-content:space-between;max-width:1200px;margin:0 auto;padding:3px 16px;font:600 .72rem system-ui,sans-serif;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--line)}
+h1.masthead{margin:0;padding:2px 0 0;font-family:'Playfair Display',Georgia,'Times New Roman',serif;font-weight:900;letter-spacing:.01em;font-size:clamp(1.8rem,6.4vh,2.7rem);line-height:1.1;color:var(--ink)}
 nav{display:flex;justify-content:center;flex-wrap:wrap;max-width:1200px;margin:0 auto;border-top:1px solid var(--ink);border-bottom:3px double var(--ink)}
-nav button{border:0;border-bottom:3px solid transparent;background:none;color:var(--ink);font:700 .7rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;padding:6px 16px;margin-bottom:-1px;cursor:pointer}
+nav button{border:0;border-bottom:3px solid transparent;background:none;color:var(--ink);font:700 .78rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;padding:6px 16px;margin-bottom:-1px;cursor:pointer}
 nav button:hover{color:var(--acc)}
 nav button.on{color:var(--acc);border-bottom-color:var(--acc)}
 nav button i{font-style:normal;display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:var(--ink);color:#fff;font-size:.62rem;margin-right:6px}
 nav button.on i{background:var(--acc)}
 
+/* ===== Scrolling tagline ===== */
+.ticker{overflow:hidden;background:var(--ink);color:#fff;white-space:nowrap;line-height:1}
+.tk{display:inline-flex;align-items:center;animation:tkmove 45s linear infinite;will-change:transform}
+.tk span{font:700 .78rem system-ui,sans-serif;letter-spacing:.22em;text-transform:uppercase;padding:6px 0}
+.tk b{color:#9cc4ec;margin:0 22px;font-size:.7rem}
+@keyframes tkmove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media(prefers-reduced-motion:reduce){.tk{animation-duration:120s}}
+
 /* ===== Layout ===== */
 main{flex:1;min-height:0;width:100%;max-width:1200px;margin:0 auto;padding:8px 16px;display:flex;flex-direction:column}
 main>section{flex:1;min-height:0;display:flex;flex-direction:column}
-.btn{font:600 .76rem system-ui,sans-serif;padding:5px 11px;border:1px solid #8a8a8a;background:#fff;color:var(--ink);border-radius:2px;cursor:pointer}
+.btn{font:600 .84rem system-ui,sans-serif;padding:5px 11px;border:1px solid #8a8a8a;background:#fff;color:var(--ink);border-radius:2px;cursor:pointer}
 .btn:hover:not(:disabled){border-color:var(--acc);color:var(--acc)}
 .btn.pri{background:var(--acc);color:var(--on-acc);border-color:var(--acc)}
 .btn.pri:hover:not(:disabled){color:#fff;filter:brightness(1.15)}
 .btn:disabled{opacity:.4;cursor:default}
 .sechead{flex:none;display:flex;justify-content:space-between;align-items:baseline;border-top:3px solid var(--ink);border-bottom:1px solid var(--line);padding:5px 0;margin-bottom:6px;font:700 .85rem Georgia,serif;text-transform:uppercase;letter-spacing:.07em}
-.sechead span+span{font:600 .66rem system-ui,sans-serif;color:var(--mut);letter-spacing:.06em}
-.kick{font:700 .62rem system-ui,sans-serif;color:var(--acc);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.sechead span+span{font:600 .76rem system-ui,sans-serif;color:var(--mut);letter-spacing:.06em}
+.kick{font:700 .74rem system-ui,sans-serif;color:var(--acc);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
 .pager{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding-top:8px;margin-top:4px;border-top:1px solid var(--line)}
 .pg{display:flex;gap:4px}
-.pg button{width:26px;height:26px;border:1px solid #8a8a8a;background:#fff;color:var(--ink);font:700 .72rem system-ui,sans-serif;cursor:pointer;border-radius:2px;padding:0}
+.pg button{width:26px;height:26px;border:1px solid #8a8a8a;background:#fff;color:var(--ink);font:700 .82rem system-ui,sans-serif;cursor:pointer;border-radius:2px;padding:0}
 .pg button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
-.res{font:700 .8rem system-ui,sans-serif}
+.res{font:700 .88rem system-ui,sans-serif}
 .pos{color:var(--ok)}.neg{color:var(--bad)}
 
 /* ===== 1. News (one story per page) ===== */
 .lead{flex:1;min-height:0;display:grid;grid-template-columns:38% 1fr;gap:22px;padding:10px 0}
 .nimg{width:100%;height:100%;min-height:120px;object-fit:cover;border:1px solid var(--line);background:var(--tint)}
 .sbody{min-height:0;overflow:auto;padding-right:6px}
-.lead h2{font-family:'Playfair Display',Georgia,serif;font-size:clamp(1.25rem,4.2vh,1.9rem);line-height:1.2;margin:0 0 8px}
-.lead .by{font:600 .68rem system-ui,sans-serif;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line)}
-.lead p{font-size:clamp(.9rem,2.4vh,1.02rem);line-height:1.6;margin:0 0 10px;color:#262626}
+.lead h2{font-family:Georgia,'Times New Roman',serif;font-size:clamp(1.25rem,4.2vh,1.9rem);line-height:1.2;margin:0 0 8px}
+.lead .by{font:600 .76rem system-ui,sans-serif;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line)}
+.lead p{font-size:clamp(.9rem,2.4vh,1.02rem);line-height:1.6;margin:0 0 10px;color:#111}
 
 /* ===== 2. Rules ===== */
 .rgrid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:0 28px;overflow:auto}
 .rule{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);min-height:0}
 .rn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 .76rem system-ui,sans-serif}
-.rule h3{margin:0 0 2px;font:700 .92rem 'Playfair Display',Georgia,serif}
-.rule p{margin:0;font-size:.82rem;line-height:1.45;color:#262626}
+.rule h3{margin:0 0 2px;font:700 1.02rem Georgia,'Times New Roman',serif}
+.rule p{margin:0;font-size:.92rem;line-height:1.45;color:#111}
 
 /* ===== 3. Quiz ===== */
 #dots{flex:none;display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
-#dots button{width:25px;height:25px;border-radius:50%;border:2px solid var(--line);background:#fff;color:var(--ink);font:600 .66rem system-ui,sans-serif;cursor:pointer;padding:0}
+#dots button{width:27px;height:27px;border-radius:50%;border:2px solid var(--line);background:#fff;color:var(--ink);font:700 .76rem system-ui,sans-serif;cursor:pointer;padding:0}
 #dots button.cur{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
 #dots button.c{background:var(--ok);color:#fff;border-color:var(--ok)}
 #dots button.w{background:var(--bad);color:#fff;border-color:var(--bad)}
 #dots button.u{background:var(--mut);color:#fff;border-color:var(--mut)}
 .slide{flex:1;min-height:0;display:flex;flex-direction:column;background:var(--card);border-top:3px solid var(--ink);padding:clamp(8px,1.6vh,16px) 6px;overflow:hidden}
-.meta{flex:none;display:flex;flex-wrap:wrap;gap:6px;font:600 .68rem system-ui,sans-serif;color:var(--mut);margin-bottom:6px}
+.meta{flex:none;display:flex;flex-wrap:wrap;gap:6px;font:600 .78rem system-ui,sans-serif;color:var(--mut);margin-bottom:6px}
 .pill{padding:2px 8px;background:var(--tint);border-radius:2px}
 .pill.who{background:var(--acc);color:var(--on-acc)}
-.q{flex:none;font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(1rem,3vh,1.45rem);line-height:1.3;margin:0 0 clamp(6px,1.4vh,12px)}
-.opts{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;gap:8px;overflow:auto}
-.opt{display:flex;gap:10px;align-items:center;text-align:left;font:inherit;font-size:clamp(.85rem,2.3vh,1.1rem);padding:6px 12px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:2px;cursor:pointer}
+.q{flex:none;font-family:Georgia,'Times New Roman',serif;font-weight:700;font-size:clamp(1.2rem,4vh,1.9rem);line-height:1.3;margin:0 0 clamp(10px,2vh,18px)}
+.opts{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:auto;align-content:start;gap:12px;overflow:auto}
+.opt{display:flex;gap:10px;align-items:center;text-align:left;font:inherit;font-size:clamp(.95rem,2.7vh,1.2rem);padding:16px 16px;min-height:72px;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:2px;cursor:pointer}
 .opt b{width:24px;height:24px;flex:none;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font:700 .76rem system-ui,sans-serif}
 .opt:hover:not(:disabled){border-color:var(--acc);background:#f3f7fb}
 .opt:disabled{cursor:default}
@@ -82,7 +90,7 @@ main>section{flex:1;min-height:0;display:flex;flex-direction:column}
 #clock.read{border-color:var(--amb);color:var(--amb)}
 #clock.ans{border-color:var(--ok);color:var(--ok)}
 #clock.end{border-color:var(--bad);color:var(--bad)}
-#phase{font:700 .78rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em}
+#phase{font:700 .86rem system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em}
 .lockbox{flex:1;min-height:0;display:grid;place-items:center;text-align:center;border:2px dashed var(--line);background:var(--bg);padding:10px}
 .lockic{font-size:clamp(2rem,8vh,3.6rem);line-height:1}
 .lockbox p{font:600 clamp(.9rem,2.4vh,1.15rem) system-ui,sans-serif;color:var(--mut);margin:6px 0 12px}
@@ -101,7 +109,7 @@ main>section{flex:1;min-height:0;display:flex;flex-direction:column}
 .grp h2{margin:0 0 6px;font-size:1rem;display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:5px}
 .grp.win{background:var(--tint);padding:10px 12px;border-top:3px solid var(--acc);font-size:1.05rem}
 .grp p{font-size:.85rem;margin:4px 0}
-table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:.8rem}
+table{width:100%;border-collapse:collapse;font-family:system-ui,sans-serif;font-size:.88rem}
 th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
 
 /* ===== Edit questions ===== */
@@ -124,6 +132,7 @@ th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
 <div class="topstrip"><span>Monday, November 23, 2026</span><span>IFB Quiz Edition</span></div>
 <h1 class="masthead">The IFB Times</h1>
 <nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tQ"><i>3</i>Quiz</button><button id="tS"><i>4</i>Results</button><button id="tE">Edit Questions</button></nav>
+<div class="ticker" aria-label="Set the customer free"><div class="tk" id="tk"></div></div>
 </header>
 <main>
 <section id="vN"></section>
@@ -134,9 +143,11 @@ th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
 </main>
 <script>
 const $=id=>document.getElementById(id),L="ABCD";
+/* scrolling tagline: two identical halves so the loop is seamless */
+(()=>{const one=Array(12).fill('<span>Set the customer free</span><b>◆</b>').join('');$("tk").innerHTML=one+one})();
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const GROUPS=[["IFB Front Load Titans",["Manish","Manav","Rudra"]],["IFB Dish Dynamos",["Siddharth","Abhiraj","Dhanashree"]],["IFB Cool Commanders",["Akshat","Ria","Abheetha"]]];
+const GROUPS=[["Front Load Titans",["Manish","Manav","Rudra"]],["Dish Dynamos",["Siddharth","Abhiraj","Dhanashree"]],["Chill Champions",["Akshat","Ria","Abheetha"]]];
 // Order: for each member -> 1 Politics/International, then 1 Business (6 per group, 18 total)
 const DEFAULT_Q=[
 ["Which leader arrived in India on his maiden bilateral trip abroad as Nepal's Prime Minister?",["KP Sharma Oli","Balen Shah","Pushpa Kamal Dahal","Sher Bahadur Deuba"],1],
@@ -199,14 +210,14 @@ function newsView(){
 /* ===================== 2. RULES ===================== */
 function rulesView(){
  const R=[
- ["Order of play","Read the three pages of news first (Business, International Affairs and Indian Politics), then these rules, then play the quiz. The scorecard and a downloadable PDF come last."],
- ["Teams","Teams are named after IFB's product ranges: "+GROUPS.map(g=>`${g[0]} (${g[1].join(", ")})`).join("; ")+"."],
- ["Questions","There are 18 questions in all, taken from the news you have just read: 6 per group. Each member gets two, one on Politics / International and one on Business Affairs, in a fixed order."],
- ["Timer",`Every question starts locked. When the quizmaster presses “Unlock & start timer”, a ${TIME}-second countdown begins. A buzzer sounds when time is up.`],
- ["Answering","Only the member whose turn it is may answer. The quizmaster marks the option chosen. If no answer is given before the buzzer, the question is marked Unanswered."],
- ["Scoring","Correct answer: +2 points. Wrong answer or unanswered: 0 points. There is no negative marking."],
- ["Winner and tie-break","The group with the most points after all 18 questions wins. If the top groups are level, five tie-break questions unlock for them; each correct answer scores 1 and the higher tie-break score wins."],
- ["Results","Open the Results tab to see each member's score, the group totals and the winner. Press “Download PDF” to save the scorecard."]];
+ ["Teams","Three teams of three members each take part in the quiz."],
+ ["Questions","There are 18 questions. Every member answers two, one on business and one on politics or international affairs, in a fixed order."],
+ ["Timer",`A question stays locked until the quizmaster presses “Unlock & start timer”. Each question then has ${TIME} seconds. A buzzer sounds when time is up.`],
+ ["Answering","Only the member whose turn it is may answer. Teammates and other people must not help. The answer given before the buzzer is final."],
+ ["Scoring","Correct answer: +20 points. Wrong answer: 0 points. No answer: 0 points. There is no negative marking."],
+ ["Winner","The team with the highest total after all questions is the winner."],
+ ["Tie-break","If teams are tied for the lead, extra tie-break questions are asked to the tied teams. The team with more correct tie-break answers wins."],
+ ["Quizmaster","The quizmaster's decision is final. The scorecard can be downloaded as a PDF from the Results tab."]];
  $("vR").innerHTML=`<div class="sechead"><span>Rules of the Quiz</span><span>Please read before you begin</span></div>
  <div class="rgrid">${R.map(([h,t],i)=>`<div class="rule"><div class="rn">${i+1}</div><div><h3>${esc(h)}</h3><p>${esc(t)}</p></div></div>`).join("")}</div>
  <div class="pager"><button class="btn" onclick="tab('N')">← Back to news</button><span></span><button class="btn pri" onclick="tab('Q')">Start the quiz →</button></div>`;
@@ -220,7 +231,7 @@ try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.q&&d.q.length==18)S=d}
 S.tieAns=S.tieAns||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const info=i=>({g:Math.floor(i/6),m:Math.floor(i%6/2),t:i%2?"Business Affairs":"International / Indian Politics"});
-const pts=(i)=>{const a=S.ans[i];if(a===undefined)return null;if(a===-1)return 0;return a===S.q[i][2]?2:0};
+const pts=(i)=>{const a=S.ans[i];if(a===undefined)return null;if(a===-1)return 0;return a===S.q[i][2]?20:0};
 function groupTotals(){return GROUPS.map((_,g)=>{let total=0;for(let i=g*6;i<g*6+6;i++){const p=pts(i);if(p!==null)total+=p}return total})}
 function tiedGroups(){if(S.q.some((_,i)=>S.ans[i]===undefined))return[];const totals=groupTotals(),high=Math.max(...totals);return totals.flatMap((n,g)=>n===high?[g]:[]).length>1?totals.flatMap((n,g)=>n===high?[g]:[]):[]}
 function tiePoints(g){return TIE_Q.reduce((n,_,i)=>n+(S.tieAns[`${g}:${i}`]===TIE_Q[i][2]?1:0),0)}
@@ -252,7 +263,7 @@ function mark(i,v){const priorTie=tiedGroups().join(",");S.ans[i]=v;if(priorTie!
 function render(){
  const tied=tiedGroups();
  if(cur>=S.q.length&&!tied.length)cur=0;
- $("dots").innerHTML=S.q.map((_,k)=>{const p=pts(k),aa=S.ans[k];return`<button class="${k==cur?"cur ":""}${p==2?"c":aa===undefined?"":aa===-1?"u":"w"}" onclick="go(${k})">${k+1}</button>`}).join("")+
+ $("dots").innerHTML=S.q.map((_,k)=>{const p=pts(k),aa=S.ans[k];return`<button class="${k==cur?"cur ":""}${p==20?"c":aa===undefined?"":aa===-1?"u":"w"}" onclick="go(${k})">${k+1}</button>`}).join("")+
  (tied.length?TIE_Q.map((_,k)=>`<button class="${S.q.length+k==cur?"cur ":""}${tied.every(g=>S.tieAns[`${g}:${k}`]!==undefined)?"c":""}" onclick="go(${S.q.length+k})">T${k+1}</button>`).join(""):"");
  if(cur>=S.q.length){renderTie(cur-S.q.length,tied);return}
  const i=cur,{g,m,t}=info(i),[q,o,c]=S.q[i],a=S.ans[i],done=a!==undefined,locked=!done&&!UL.has(i);
@@ -262,7 +273,7 @@ function render(){
  <div class="bar"><div class="timer"><div id="clock">${TIME}</div><div id="phase">${locked?"Locked":"Ready"}</div>${locked?"":`<button class="btn pri" id="start" onclick="startTimer()">▶ Restart timer</button>`}</div>
  <div>${locked?"":`<button class="btn" onclick="mark(${i},-1)">Unanswered (0)</button>`} ${done?`<button class="btn" onclick="clr(${i})">Clear</button>`:""}</div></div>
  <div class="bar"><button class="btn" onclick="go(${i-1})" ${i==0?"disabled":""}>← Previous</button>
- <span class="res ${p>0?"pos":wr?"neg":""}">${done?(p>0?"Correct +2":wr?"Wrong 0":"Unanswered 0")+" · "+GROUPS[g][1][m]:"Not marked yet"}</span>
+ <span class="res ${p>0?"pos":wr?"neg":""}">${done?(p>0?"Correct +20":wr?"Wrong 0":"Unanswered 0")+" · "+GROUPS[g][1][m]:"Not marked yet"}</span>
  ${i==17&&!tied.length?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${i+1})">Next →</button>`}</div>`;
 }
 function renderTie(i,tied){
@@ -318,7 +329,7 @@ function dlPdf(){
   T(40,y,"Tie-breaker",13,1);y-=8;Ln(40,y,555,y);y-=16;
   tied.forEach(g=>{T(48,y,GROUPS[g][0]+": "+tiePoints(g)+" / "+TIE_Q.length+" correct",11);y-=16});
   T(48,y,tieBreakStatus(tied),11,1);y-=22}
- T(40,40,"Scoring: +2 correct, 0 wrong, 0 unanswered.",9);
+ T(40,40,"Scoring: +20 for a correct answer, 0 for a wrong answer or no answer.",9);
  const o=[];
  o[1]="<</Type/Catalog/Pages 2 0 R>>";
  o[2]="<</Type/Pages/Kids[3 0 R]/Count 1>>";
