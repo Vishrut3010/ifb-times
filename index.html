@@ -319,6 +319,20 @@ function mvpInfo(){
  const top=Math.max(...all.map(a=>a.t));if(top<=0)return null;
  const best=all.filter(a=>a.t===top);
  return{pts:top,names:best.map(a=>`${a.n} (${GROUPS[a.g][0]})`),set:new Set(best.map(a=>a.g+":"+a.m))}}
+/* applause: a crowd of short filtered-noise claps, generated with Web Audio (no files needed) */
+function applause(){
+ try{
+  const a=actx(),dur=4.5,len=Math.floor(a.sampleRate*.12),buf=a.createBuffer(1,len,a.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,6);
+  const master=a.createGain();master.gain.value=.55;master.connect(a.destination);
+  for(let k=0;k<190;k++){
+   const pos=Math.random()*dur,env=Math.pow(Math.sin(Math.PI*Math.min(1,.12+pos/dur*.88)),.7);
+   const src=a.createBufferSource();src.buffer=buf;src.playbackRate.value=.8+Math.random()*.7;
+   const f=a.createBiquadFilter();f.type="bandpass";f.frequency.value=1200+Math.random()*2200;f.Q.value=.8;
+   const g=a.createGain();g.gain.value=(.25+Math.random()*.5)*env;
+   src.connect(f);f.connect(g);g.connect(master);src.start(a.currentTime+pos)}
+ }catch(e){}
+}
 function party(){
  if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
  const old=document.getElementById("confetti");if(old)old.remove();
@@ -394,7 +408,7 @@ function score(){
   return`<div class="grp${wg===g?" champ":""}"><h2><span>${wg===g?"👑 ":""}${gn}</span><span>Total: ${gt}</span></h2><table><tr><th>Member</th><th>Politics / Intl</th><th>Business</th><th>Total</th></tr>${rows}</table></div>`}).join("")
   +(tiedGroups().length?`<div class="grp full"><h2>Tie-breaker</h2><p>Unlocked for ${tiedGroups().map(g=>GROUPS[g][0]).join(", ")} because the completed scorecard is tied for the lead. Each tied team\u2019s MVP answers the ${TIE_Q.length} tie-breaker questions: ${tiedGroups().map(g=>GROUPS[g][0]+" – "+teamMvp(g).join(" / ")).join("; ")}.</p>${tiedGroups().map(g=>`<p>${GROUPS[g][0]}: ${tiePoints(g)} / ${TIE_Q.length} correct</p>`).join("")}<p><b>${tieBreakStatus(tiedGroups())}</b></p></div>`:"")
   +`<div class="full"><button class="btn pri" onclick="dlPdf()">⬇ Download PDF</button> <button class="btn" onclick="tab('Q')">← Back to quiz</button> <button class="btn" onclick="if(confirm('Clear all marks?')){S.ans={};S.tieAns={};UL.clear();save();score()}">Reset all scores</button></div>`;
- if(wg!==null)party();
+ if(wg!==null){party();applause()}
 }
 
 function dlPdf(){
