@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import streamlit as st
+import streamlit.components.v1 as components
 
 st.set_page_config(
     page_title="The IFB Times",
@@ -23,9 +24,17 @@ st.markdown(
 
 PAGE = Path(__file__).parent / "index.html"
 
-try:
-    st.iframe(PAGE, height=900)  # Streamlit 1.56+
-except AttributeError:  # older Streamlit versions
-    import streamlit.components.v1 as components
 
-    components.html(PAGE.read_text(encoding="utf-8"), height=900, scrolling=False)
+@st.fragment(run_every=2)
+def watch_for_changes():
+    """Re-run the app whenever index.html changes on disk (local use)."""
+    mtime = PAGE.stat().st_mtime
+    if st.session_state.get("page_mtime") not in (None, mtime):
+        st.session_state["page_mtime"] = mtime
+        st.rerun()
+    st.session_state["page_mtime"] = mtime
+
+
+# Read the file fresh on every run (no static-file caching)
+components.html(PAGE.read_text(encoding="utf-8"), height=900, scrolling=False)
+watch_for_changes()
