@@ -226,7 +226,7 @@ function rulesView(){
 /* ===================== 3. QUIZ ===================== */
 const lockBox=k=>`<div class="lockbox"><div><div class="lockic">🔒</div><p>This question is locked</p><button class="btn pri big" onclick="unlock('${k}')">🔓 Unlock &amp; start timer</button></div></div>`;
 function unlock(k){UL.add(/^\d+$/.test(k)?+k:k);render();startTimer()}
-const KEY="etquiz.v1";let S={q:DEFAULT_Q,ans:{},tieAns:{}},cur=0,tm=null,ac=null,tick=null;
+const KEY="ifbtimes.v2";let S={q:DEFAULT_Q,ans:{},tieAns:{}},cur=0,tm=null,ac=null,tick=null;
 try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&d.q&&d.q.length==18)S=d}catch(e){}
 S.tieAns=S.tieAns||{};
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
