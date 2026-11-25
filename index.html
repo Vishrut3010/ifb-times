@@ -189,16 +189,39 @@ main>section:not(.hide){animation:fadeUp .35s ease both}
 .navbar{justify-content:center;gap:12px}
 .navbar>button:last-child{order:1}
 .navbar>span{order:2}
+
+/* ===== Meet the Teams ===== */
+#vT{overflow:auto}
+.tstage{flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding:8px 0;background:radial-gradient(ellipse at 50% 0%,color-mix(in srgb,var(--tc) 14%,transparent),transparent 70%)}
+.tbadge{font-size:clamp(2.6rem,10vh,4.6rem);line-height:1}
+.tname{margin:0;font-family:'Playfair Display',Georgia,serif;font-weight:900;font-size:clamp(1.9rem,8vh,3.6rem);line-height:1.1;color:var(--tc)}
+.ttag{margin:0;font:600 clamp(.95rem,2.6vh,1.2rem) system-ui,sans-serif;color:var(--mut)}
+.tprod{margin:0 0 8px;font:700 .72rem system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.mystery{filter:grayscale(1);opacity:.6;animation:wob 1.2s ease-in-out infinite}
+.roster{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:100%;max-width:880px;margin-top:6px}
+.pcard{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--card);border:1px solid var(--line);border-top:5px solid var(--tc);border-radius:18px;box-shadow:var(--shadow);padding:16px 10px}
+.pcard h3{margin:4px 0 0;font:700 clamp(1.1rem,3.4vh,1.6rem) Georgia,serif}
+.pcard p{margin:0;font:600 .8rem system-ui,sans-serif;color:var(--mut)}
+.jersey{width:68px;height:68px;border-radius:16px;display:grid;place-items:center;background:var(--tc);color:#fff;font:900 2rem 'Playfair Display',Georgia,serif;box-shadow:inset 0 -6px 0 rgba(0,0,0,.15)}
+.pcard.hidden{background:var(--tint);border-top-color:var(--line);box-shadow:none}
+.pcard.hidden .jersey{background:#cfc9b8;box-shadow:none}
+.pcard.hidden h3{color:var(--mut)}
+.pop{animation:popIn .7s cubic-bezier(.3,1.7,.5,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.3) rotate(-8deg)}to{opacity:1;transform:none}}
+@keyframes wob{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+@media(max-width:700px){.roster{grid-template-columns:1fr;gap:10px}.pcard{flex-direction:row;justify-content:flex-start;gap:12px;text-align:left;padding:10px 14px}.pcard h3{margin:0}}
+@media(prefers-reduced-motion:reduce){.pop,.mystery{animation:none!important}}
 </style></head><body>
 <header>
 <div class="topstrip"><span>Thursday, November 26, 2026</span><span>IFB Quiz Edition</span></div>
 <h1 class="masthead">The IFB Times</h1>
-<nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tQ"><i>3</i>Quiz</button><button id="tS"><i>4</i>Results</button><button id="tE">Edit Questions</button></nav>
+<nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tT"><i>3</i>Meet the Teams</button><button id="tQ"><i>4</i>Quiz</button><button id="tS"><i>5</i>Results</button><button id="tE">Edit Questions</button></nav>
 <div class="ticker" aria-label="Set the customer free"><div class="tk" id="tk"></div></div>
 </header>
 <main>
 <section id="vN"></section>
 <section id="vR" class="hide"></section>
+<section id="vT" class="hide"></section>
 <section id="vQ" class="hide"><div id="dots"></div><div class="slide" id="slide"></div></section>
 <section id="vS" class="hide"></section>
 <section id="vE" class="hide"></section>
@@ -210,6 +233,11 @@ const $=id=>document.getElementById(id),L="ABCD";
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 const GROUPS=[["Fluff Fury",["Manish","Manav","Rudra"]],["Autodish Avengers",["Siddharth","Abhiraj","Dhanashree"]],["Descal Dragons",["Akshat","Ria","Abheetha"]]];
+/* Fun details for the "Meet the Teams" intro. Edit emoji (ic), colour (c), tagline (tag), product and jersey numbers (jer, one per member). */
+const TEAM_INFO=[
+ {ic:"🧺",c:"#d6336c",tag:"Soft on fabric. Fierce on stains.",prod:"Fluff Matic",jer:[1,2,3]},
+ {ic:"🍽️",c:"#1f9d6b",tag:"Assemble! No plate left dirty.",prod:"Autodish",jer:[4,5,6]},
+ {ic:"🐉",c:"#8a3ffc",tag:"Breathing fire on limescale.",prod:"Descal",jer:[7,8,9]}];
 // Order: for each member -> 1 Politics/International, then 1 Business (6 per group, 18 total)
 const DEFAULT_Q=[
 ["Which leader arrived in India on his maiden bilateral trip abroad as Nepal's Prime Minister?",["KP Sharma Oli","Balen Shah","Pushpa Kamal Dahal","Sher Bahadur Deuba"],1],
@@ -267,6 +295,35 @@ function newsView(){
  ${last?`<button class="btn pri" onclick="tab('R')">Rules of the quiz →</button>`:`<button class="btn pri" onclick="nPage++;newsView()">Next page →</button>`}</div>`;
 }
 
+
+/* ===================== MEET THE TEAMS (intro show) ===================== */
+let tI=0,tSt=0,tBusy=false; /* tSt: 0 hidden, 1 team revealed, 2-4 players 1-3 revealed */
+function tone(f,t,d,type="triangle",v=.2){const a=actx(),o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;const t0=a.currentTime+t;g.gain.setValueAtTime(.001,t0);g.gain.linearRampToValueAtTime(v,t0+.02);g.gain.exponentialRampToValueAtTime(.001,t0+d);o.connect(g);g.connect(a.destination);o.start(t0);o.stop(t0+d+.05)}
+function drumroll(){try{for(let i=0;i<24;i++)tone(105+Math.random()*25,i*.045,.09,"sine",.08+i*.012);
+ [[523,1.1],[659,1.2],[784,1.3]].forEach(([f,t])=>tone(f,t,.35,"triangle",.22));tone(1047,1.42,.9,"triangle",.25);tone(523,1.42,.9,"sawtooth",.06);tone(784,1.42,.9,"triangle",.12)}catch(e){}}
+function chime(){try{tone(880,0,.18,"triangle",.2);tone(1319,.1,.35,"triangle",.2)}catch(e){}}
+function teamsView(){
+ const g=tI,[gn,ms]=GROUPS[g],ti=TEAM_INFO[g],st=tSt,lastTeam=g==GROUPS.length-1;
+ const label=st==0?"🥁 Reveal the team":st<4?`🎤 Reveal player ${st}`:(lastTeam?"Start the quiz →":"Next team →");
+ const head=st>=1?`<div class="tbadge${st==1?" pop":""}">${ti.ic}</div><h2 class="tname${st==1?" pop":""}">${esc(gn)}</h2><p class="ttag">${esc(ti.tag)}</p><p class="tprod">Powered by IFB Essentials · ${esc(ti.prod)}</p>`
+  :`<div class="tbadge mystery">❓</div><h2 class="tname">Introducing…</h2><p class="ttag">Team ${g+1} of ${GROUPS.length}</p>`;
+ const cards=ms.map((n,m)=>{const q1=g*6+m*2+1;
+  return st>=m+2?`<div class="pcard${st==m+2?" pop":""}"><div class="jersey">${ti.jer[m]}</div><h3>${esc(n)}</h3><p>Answers Q${q1} &amp; Q${q1+1}</p></div>`
+  :`<div class="pcard hidden"><div class="jersey">?</div><h3>Player ${m+1}</h3><p>&nbsp;</p></div>`}).join("");
+ $("vT").innerHTML=`<div class="sechead"><span>Meet the Teams</span><span>Team ${g+1} of ${GROUPS.length}</span></div>
+ <div class="tstage" style="--tc:${ti.c}">${head}<div class="roster">${cards}</div></div>
+ <div class="pager"><button class="btn" onclick="teamBack()" ${g==0&&st==0?"disabled":""}>← Back</button>
+ <button class="btn pri" onclick="teamNext()">${label}</button>
+ <button class="btn" onclick="tI=0;tSt=0;teamsView()">↺ Restart intro</button></div>`;
+}
+function teamBack(){if(tBusy)return;if(tSt>0)tSt--;else if(tI>0){tI--;tSt=4}teamsView()}
+function teamNext(){
+ if(tBusy)return;
+ if(tSt==4){if(tI==GROUPS.length-1){tab("Q");return}tI++;tSt=0;teamsView();return}
+ tBusy=true;const first=tSt==0;
+ if(first)drumroll();else chime();
+ setTimeout(()=>{tSt++;tBusy=false;teamsView();if(first)party("vT")},first?1250:350)}
+
 /* ===================== 2. RULES ===================== */
 function rulesView(){
  const R=[
@@ -277,7 +334,7 @@ function rulesView(){
  ["Scoring & Winner","Correct answer: +20 points. Wrong or no answer: 0 points. The team with the highest total wins; if teams are tied for the lead, 2 tie-break questions decide, answered by each tied team’s MVP."]];
  $("vR").innerHTML=`<div class="sechead"><span>Rules of the Quiz</span><span>Please read before you begin</span></div>
  <div class="rgrid">${R.map(([h,t],i)=>`<div class="rule"><div class="rn">${i+1}</div><div><h3>${esc(h)}</h3><p>${esc(t)}</p></div></div>`).join("")}</div>
- <div class="pager"><button class="btn" onclick="tab('N')">← Back to news</button><span></span><button class="btn pri" onclick="tab('Q')">Start the quiz →</button></div>`;
+ <div class="pager"><button class="btn" onclick="tab('N')">← Back to news</button><span></span><button class="btn pri" onclick="tab('T')">Meet the teams →</button></div>`;
 }
 
 /* ===================== 3. QUIZ ===================== */
@@ -333,7 +390,7 @@ function applause(){
    src.connect(f);f.connect(g);g.connect(master);src.start(a.currentTime+pos)}
  }catch(e){}
 }
-function party(){
+function party(sec="vS"){
  if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
  const old=document.getElementById("confetti");if(old)old.remove();
  const cv=document.createElement("canvas");cv.id="confetti";
@@ -351,7 +408,7 @@ function party(){
    p.vx*=.985;p.vy+=.34;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
    const age=f-p.d;if(age>110)x.globalAlpha=Math.max(0,1-(age-110)/60);else x.globalAlpha=1;
    if(x.globalAlpha>0&&p.y<H+20){alive=true;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()}});
-  if(alive&&f<340&&!$("vS").classList.contains("hide"))requestAnimationFrame(loop);else cv.remove()})();
+  if(alive&&f<340&&!$(sec).classList.contains("hide"))requestAnimationFrame(loop);else cv.remove()})();
 }
 
 /* sounds (generated with Web Audio, no files needed) */
@@ -474,9 +531,9 @@ function exp(){const a=document.createElement("a");a.href=URL.createObjectURL(ne
 function imp(f){const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.length!=18)throw 0;S.q=d;save();edit()}catch(e){alert("Invalid file: need 18 questions.")}};r.readAsText(f.files[0])}
 
 /* ===================== TABS ===================== */
-function tab(t){stopTimer();["N","R","Q","S","E"].forEach(k=>{$("v"+k).classList.toggle("hide",k!=t);$("t"+k).classList.toggle("on",k==t)});
- if(t=="N")newsView();if(t=="R")rulesView();if(t=="Q")render();if(t=="S")score();if(t=="E")edit()}
-["N","R","Q","S","E"].forEach(k=>$("t"+k).onclick=()=>tab(k));
+function tab(t){stopTimer();["N","R","T","Q","S","E"].forEach(k=>{$("v"+k).classList.toggle("hide",k!=t);$("t"+k).classList.toggle("on",k==t)});
+ if(t=="N")newsView();if(t=="R")rulesView();if(t=="T")teamsView();if(t=="Q")render();if(t=="S")score();if(t=="E")edit()}
+["N","R","T","Q","S","E"].forEach(k=>$("t"+k).onclick=()=>tab(k));
 document.addEventListener("keydown",e=>{if($("vQ").classList.contains("hide")||/INPUT|TEXTAREA/.test(e.target.tagName))return;if(e.key=="Enter"){const b=document.querySelector(".lockbox .btn");if(b)b.click()}if(e.key=="ArrowRight")go(cur+1);if(e.key=="ArrowLeft")go(cur-1)});
 tab("N");
 </script></body></html>
