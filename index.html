@@ -127,9 +127,65 @@ th,td{padding:5px 6px;border-bottom:1px solid var(--line);text-align:left}
  nav button{padding:6px 9px}
 }
 @media(max-width:700px){.opts{grid-template-columns:1fr}.opt{font-size:.9rem;padding:5px 10px}}
+
+/* ===== Softer, smoother finish ===== */
+:root{--bg:#f7f5ef;--ink:#262626;--mut:#5b5b5b;--line:#e6e2d7;--tint:#f2efe6;--shadow:0 1px 2px rgba(20,20,20,.05),0 8px 22px rgba(20,20,20,.06)}
+*{scrollbar-width:thin;scrollbar-color:#cfc9b8 transparent}
+body{-webkit-font-smoothing:antialiased}
+header{border-bottom:0;box-shadow:0 2px 14px rgba(0,0,0,.06)}
+nav{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+nav button{border-radius:10px 10px 0 0;letter-spacing:.06em;transition:color .2s,background .2s,border-color .2s}
+nav button:hover{background:var(--tint)}
+nav button i{background:var(--mut);transition:background .2s}
+.ticker{background:#141414}
+.btn{border-radius:999px;border-color:var(--line);padding:6px 15px;box-shadow:0 1px 2px rgba(0,0,0,.06);transition:transform .2s,box-shadow .2s,border-color .2s,color .2s,filter .2s}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 10px rgba(14,77,140,.18)}
+.btn.pri{border-color:var(--acc)}
+.pg button{border-radius:50%;border-color:var(--line);transition:all .2s}
+.pg button:hover{border-color:var(--acc);color:var(--acc)}
+.pg button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.sechead{border-top:2px solid var(--acc)}
+.nimg{border:0;border-radius:16px;box-shadow:var(--shadow)}
+.lead p,.rule p{color:#2c2c2c}
+.lead{animation:fadeUp .4s ease both}
+.rn{background:var(--acc)}
+#dots button{border-width:1px;transition:transform .2s,background .2s,border-color .2s}
+#dots button:hover{transform:scale(1.1)}
+.slide{border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:clamp(12px,2vh,22px) clamp(14px,2vw,26px)}
+.pill{border-radius:999px;padding:3px 11px}
+.opt{border-radius:14px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:transform .2s,box-shadow .2s,border-color .2s,background .2s}
+.opt:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 14px rgba(14,77,140,.12)}
+.opt b{background:var(--acc)}
+.opt.picked{outline:2px solid var(--acc);outline-offset:1px}
+#clock{border-width:4px;transition:border-color .3s,color .3s}
+.lockbox{border:1.5px dashed #d2ccbb;border-radius:16px;background:var(--tint)}
+.tie-team{border-radius:14px}
+.grp{border:1px solid var(--line);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow)}
+.grp.win{border-left:4px solid var(--acc)}
+.ed{border-radius:14px}
+.ed input[type=text],.ed textarea{border-radius:8px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+main>section:not(.hide){animation:fadeUp .35s ease both}
+@media(prefers-reduced-motion:reduce){main>section,.lead{animation:none!important}.btn,.opt{transition:none!important}}
+
+/* ===== Pager: black instead of blue, controls on the right (left stays empty) ===== */
+.npager{justify-content:flex-end;gap:14px}
+.pager .btn.pri{background:#141414;border-color:#141414;color:#fff}
+.pager .btn:hover:not(:disabled){border-color:#141414;color:#141414;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.pager .btn.pri:hover:not(:disabled){color:#fff;filter:brightness(1.35)}
+.pg button:hover{border-color:#141414;color:#141414}
+.pg button.on,.pg button.on:hover{background:#141414;border-color:#141414;color:#fff}
+
+/* ===== Winner crown & MVP ===== */
+#vS:not(.hide){padding-top:24px}
+#vS .full{margin-bottom:6px}
+.grp.champ{position:relative;border:2px solid #d4a017;background:linear-gradient(#fffbea,#fff)}
+.grp.champ::before{content:"👑";position:absolute;top:-24px;left:50%;transform:translateX(-50%) rotate(-8deg);font-size:2rem;line-height:1;animation:crownIn .8s cubic-bezier(.3,1.6,.5,1) both}
+.grp.mvp{border-left-color:#d4a017;background:#fffbea}
+@keyframes crownIn{from{opacity:0;transform:translate(-50%,-34px) rotate(-30deg) scale(.4)}to{opacity:1;transform:translateX(-50%) rotate(-8deg)}}
 </style></head><body>
 <header>
-<div class="topstrip"><span>Monday, November 23, 2026</span><span>IFB Quiz Edition</span></div>
+<div class="topstrip"><span>Thursday, November 26, 2026</span><span>IFB Quiz Edition</span></div>
 <h1 class="masthead">The IFB Times</h1>
 <nav><button id="tN" class="on"><i>1</i>News</button><button id="tR"><i>2</i>Rules</button><button id="tQ"><i>3</i>Quiz</button><button id="tS"><i>4</i>Results</button><button id="tE">Edit Questions</button></nav>
 <div class="ticker" aria-label="Set the customer free"><div class="tk" id="tk"></div></div>
@@ -147,7 +203,7 @@ const $=id=>document.getElementById(id),L="ABCD";
 (()=>{const one=Array(12).fill('<span>Set the customer free</span><b>◆</b>').join('');$("tk").innerHTML=one+one})();
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const GROUPS=[["Front Load Titans",["Manish","Manav","Rudra"]],["Dish Dynamos",["Siddharth","Abhiraj","Dhanashree"]],["Chill Champions",["Akshat","Ria","Abheetha"]]];
+const GROUPS=[["Fluff Fury",["Manish","Manav","Rudra"]],["Autodish Avengers",["Siddharth","Abhiraj","Dhanashree"]],["Descal Dragons",["Akshat","Ria","Abheetha"]]];
 // Order: for each member -> 1 Politics/International, then 1 Business (6 per group, 18 total)
 const DEFAULT_Q=[
 ["Which leader arrived in India on his maiden bilateral trip abroad as Nepal's Prime Minister?",["KP Sharma Oli","Balen Shah","Pushpa Kamal Dahal","Sher Bahadur Deuba"],1],
@@ -170,10 +226,7 @@ const DEFAULT_Q=[
 ["Which soft drink is Coca-Cola bringing back after 26 years?",["Gold Spot","Thums Up","Limca","Maaza"],0]];
 const TIE_Q=[
 ["What valuation range are public market investors estimating for Oravel Stays ahead of its proposed IPO?",["₹20,000–22,000 crore","₹15,000–17,000 crore","₹25,000–27,000 crore","₹30,000–32,000 crore"],0],
-["Which US hospitality company did Oravel Stays acquire in December 2024?",["Choice Hotels","G6 Hospitality","Wyndham Hotels","Marriott International"],1],
-["What percentage of Mahindra Finance’s total assets under management comes from vehicle loans?",["60%","70%","80%","90%"],2],
-["What data centre capacity is Karnataka targeting by 2031?",["500 MW","750 MW","1,000 MW","1,500 MW"],2],
-["How much funding is Cognition AI reportedly considering raising at a proposed $75 billion valuation?",["$500 million or more","$1 billion or more","$2 billion or more","$5 billion or more"],2]];
+["Which US hospitality company did Oravel Stays acquire in December 2024?",["Choice Hotels","G6 Hospitality","Wyndham Hotels","Marriott International"],1]];
 const TIME=10; /* seconds per question: one single countdown */
 const UL=new Set(); /* questions unlocked this session */
 
@@ -182,13 +235,13 @@ const UL=new Set(); /* questions unlocked this session */
    Edit the title, source, date and body of each story below (blank line in body = new paragraph).
    To use a real photo, add  img:"https://..."  to a story. If it fails to load, the illustration is shown. */
 const NEWS=[
-{cat:"Business",title:"[Business story headline to be added]",source:"IFB Times Desk",date:"23 Nov 2026",
+{cat:"Business",title:"[Business story headline to be added]",source:"IFB Times Desk",date:"26 Nov 2026",
  body:"The business story for this edition will appear here.\n\nReplace this text with the full story. Each blank line starts a new paragraph.",
  ic:"💼",lab:"BUSINESS",c1:"#4a3b1d",c2:"#b8893a"},
-{cat:"International Affairs",title:"[International affairs story headline to be added]",source:"IFB Times Desk",date:"23 Nov 2026",
+{cat:"International Affairs",title:"[International affairs story headline to be added]",source:"IFB Times Desk",date:"26 Nov 2026",
  body:"The international affairs story for this edition will appear here.\n\nReplace this text with the full story. Each blank line starts a new paragraph.",
  ic:"🌍",lab:"INTERNATIONAL AFFAIRS",c1:"#1f3a5f",c2:"#4b7bb0"},
-{cat:"Indian Politics",title:"[Indian politics story headline to be added]",source:"IFB Times Desk",date:"23 Nov 2026",
+{cat:"Indian Politics",title:"[Indian politics story headline to be added]",source:"IFB Times Desk",date:"26 Nov 2026",
  body:"The Indian politics story for this edition will appear here.\n\nReplace this text with the full story. Each blank line starts a new paragraph.",
  ic:"🏛️",lab:"INDIAN POLITICS",c1:"#5c2a2a",c2:"#a5543f"}
 ];
@@ -200,9 +253,9 @@ function art(a){
 function newsView(){
  const pages=NEWS.length;nPage=Math.min(Math.max(nPage,0),pages-1);
  const a=NEWS[nPage],last=nPage==pages-1;
- $("vN").innerHTML=`<div class="sechead"><span>Page ${nPage+1} · ${esc(a.cat)}</span><span>Monday, 23 November 2026</span></div>
+ $("vN").innerHTML=`<div class="sechead"><span>Page ${nPage+1} · ${esc(a.cat)}</span><span>Thursday, 26 November 2026</span></div>
  <article class="lead"><img class="nimg" src="${esc(a.img||art(a))}" alt="${esc(a.lab)}" onerror="this.onerror=null;this.src=art(NEWS[${nPage}])"><div class="sbody"><div class="kick">${esc(a.cat)}</div><h2>${esc(a.title)}</h2><div class="by">${[a.source,a.date].filter(Boolean).map(esc).join(" · ")}</div>${String(a.body).split(/\n\s*\n/).map(x=>`<p>${esc(x)}</p>`).join("")}</div></article>
- <div class="pager"><button class="btn" onclick="nPage--;newsView()" ${nPage==0?"disabled":""}>← Previous page</button>
+ <div class="pager npager"><button class="btn" onclick="nPage--;newsView()" ${nPage==0?"disabled":""}>← Previous page</button>
  <div class="pg">${Array.from({length:pages},(_,p)=>`<button class="${p==nPage?"on":""}" onclick="nPage=${p};newsView()">${p+1}</button>`).join("")}</div>
  ${last?`<button class="btn pri" onclick="tab('R')">Rules of the quiz →</button>`:`<button class="btn pri" onclick="nPage++;newsView()">Next page →</button>`}</div>`;
 }
@@ -214,10 +267,7 @@ function rulesView(){
  ["Questions","There are 18 questions. Every member answers two, one on business and one on politics or international affairs, in a fixed order."],
  ["Timer",`A question stays locked until the quizmaster presses “Unlock & start timer”. Each question then has ${TIME} seconds. A buzzer sounds when time is up.`],
  ["Answering","Only the member whose turn it is may answer. Teammates and other people must not help. The answer given before the buzzer is final."],
- ["Scoring","Correct answer: +20 points. Wrong answer: 0 points. No answer: 0 points. There is no negative marking."],
- ["Winner","The team with the highest total after all questions is the winner."],
- ["Tie-break","If teams are tied for the lead, extra tie-break questions are asked to the tied teams. The team with more correct tie-break answers wins."],
- ["Quizmaster","The quizmaster's decision is final. The scorecard can be downloaded as a PDF from the Results tab."]];
+ ["Scoring & Winner","Correct answer: +20 points. Wrong or no answer: 0 points. The team with the highest total wins; if teams are tied for the lead, 2 tie-break questions decide, answered by each tied team’s MVP."]];
  $("vR").innerHTML=`<div class="sechead"><span>Rules of the Quiz</span><span>Please read before you begin</span></div>
  <div class="rgrid">${R.map(([h,t],i)=>`<div class="rule"><div class="rn">${i+1}</div><div><h3>${esc(h)}</h3><p>${esc(t)}</p></div></div>`).join("")}</div>
  <div class="pager"><button class="btn" onclick="tab('N')">← Back to news</button><span></span><button class="btn pri" onclick="tab('Q')">Start the quiz →</button></div>`;
@@ -234,14 +284,52 @@ const info=i=>({g:Math.floor(i/6),m:Math.floor(i%6/2),t:i%2?"Business Affairs":"
 const pts=(i)=>{const a=S.ans[i];if(a===undefined)return null;if(a===-1)return 0;return a===S.q[i][2]?20:0};
 function groupTotals(){return GROUPS.map((_,g)=>{let total=0;for(let i=g*6;i<g*6+6;i++){const p=pts(i);if(p!==null)total+=p}return total})}
 function tiedGroups(){if(S.q.some((_,i)=>S.ans[i]===undefined))return[];const totals=groupTotals(),high=Math.max(...totals);return totals.flatMap((n,g)=>n===high?[g]:[]).length>1?totals.flatMap((n,g)=>n===high?[g]:[]):[]}
+function teamMvp(g){const r=GROUPS[g][1].map((n,m)=>({n,t:[0,1].reduce((a,k)=>a+(pts(g*6+m*2+k)||0),0)})),top=Math.max(...r.map(x=>x.t));return r.filter(x=>x.t===top).map(x=>x.n)}
 function tiePoints(g){return TIE_Q.reduce((n,_,i)=>n+(S.tieAns[`${g}:${i}`]===TIE_Q[i][2]?1:0),0)}
-function tieBreakStatus(groups){if(groups.some(g=>TIE_Q.some((_,i)=>S.tieAns[`${g}:${i}`]===undefined)))return"Answer all five questions for each tied group to determine the winner.";const high=Math.max(...groups.map(tiePoints)),winners=groups.filter(g=>tiePoints(g)===high);return winners.length===1?`${GROUPS[winners[0]][0]} wins the tie-break.`:"The tie remains after all five questions."}
+function tieBreakStatus(groups){if(groups.some(g=>TIE_Q.some((_,i)=>S.tieAns[`${g}:${i}`]===undefined)))return"Answer both tie-breaker questions for each tied team to determine the winner.";const high=Math.max(...groups.map(tiePoints)),winners=groups.filter(g=>tiePoints(g)===high);return winners.length===1?`${GROUPS[winners[0]][0]} wins the tie-break.`:"The tie remains after both tie-breaker questions."}
 function winnerInfo(){
  if(S.q.some((_,i)=>S.ans[i]===undefined))return null;
  const totals=groupTotals(),tied=tiedGroups();
  if(tied.length)return tieBreakStatus(tied);
  const g=totals.indexOf(Math.max(...totals));
  return`${GROUPS[g][0]} wins with ${totals[g]} points.`;
+}
+
+/* winning team, MVP and celebration */
+function winnerGroup(){
+ if(S.q.some((_,i)=>S.ans[i]===undefined))return null;
+ const tied=tiedGroups();
+ if(tied.length){
+  if(tied.some(g=>TIE_Q.some((_,i)=>S.tieAns[`${g}:${i}`]===undefined)))return null;
+  const high=Math.max(...tied.map(tiePoints)),ws=tied.filter(g=>tiePoints(g)===high);
+  return ws.length===1?ws[0]:null}
+ const t=groupTotals();return t.indexOf(Math.max(...t))}
+function mvpInfo(){
+ if(S.q.some((_,i)=>S.ans[i]===undefined))return null;
+ const all=[];
+ GROUPS.forEach(([gn,ms],g)=>ms.forEach((n,m)=>{let t=0;for(let k=0;k<2;k++)t+=pts(g*6+m*2+k)||0;all.push({g,m,n,t})}));
+ const top=Math.max(...all.map(a=>a.t));if(top<=0)return null;
+ const best=all.filter(a=>a.t===top);
+ return{pts:top,names:best.map(a=>`${a.n} (${GROUPS[a.g][0]})`),set:new Set(best.map(a=>a.g+":"+a.m))}}
+function party(){
+ if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+ const old=document.getElementById("confetti");if(old)old.remove();
+ const cv=document.createElement("canvas");cv.id="confetti";
+ cv.style.cssText="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50";
+ document.body.appendChild(cv);
+ const W=cv.width=innerWidth,H=cv.height=innerHeight,x=cv.getContext("2d");
+ const cols=["#e63946","#f4a300","#2a9d8f","#1d70b8","#9b5de5","#f15bb5","#ffd60a"],P=[];
+ [0,45].forEach(delay=>[0,1].forEach(side=>{for(let i=0;i<90;i++){
+  const deg=side==0?-(25+Math.random()*55):-(100+Math.random()*55),a=deg*Math.PI/180,sp=Math.min(W,H)/38*(.6+Math.random()*.9)+6;
+  P.push({x:side?W:0,y:H,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,w:6+Math.random()*6,h:3+Math.random()*5,r:Math.random()*6,vr:(Math.random()-.5)*.4,c:cols[i%cols.length],d:delay})}}));
+ let f=0;
+ (function loop(){
+  x.clearRect(0,0,W,H);f++;let alive=false;
+  P.forEach(p=>{if(f<p.d){alive=true;return}
+   p.vx*=.985;p.vy+=.34;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+   const age=f-p.d;if(age>110)x.globalAlpha=Math.max(0,1-(age-110)/60);else x.globalAlpha=1;
+   if(x.globalAlpha>0&&p.y<H+20){alive=true;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore()}});
+  if(alive&&f<340&&!$("vS").classList.contains("hide"))requestAnimationFrame(loop);else cv.remove()})();
 }
 
 /* sounds (generated with Web Audio, no files needed) */
@@ -283,21 +371,22 @@ function renderTie(i,tied){
  <div class="bar"><div class="timer"><div id="clock">${TIME}</div><div id="phase">${locked?"Locked":"Ready"}</div>${locked?"":`<button class="btn pri" id="start" onclick="startTimer()">▶ Restart timer</button>`}</div><span class="res">Timer applies to all tied groups; tie-break points are separate.</span></div>
  <div class="bar"><button class="btn" onclick="go(${S.q.length+i-1})">← Previous</button><span></span>${i==TIE_Q.length-1?`<button class="btn pri" onclick="tab('S')">See results →</button>`:`<button class="btn" onclick="go(${S.q.length+i+1})">Next →</button>`}</div>`;
 }
-function tieTeamContent(i,g){const[q,o,c]=TIE_Q[i],a=S.tieAns[`${g}:${i}`],done=a!==undefined;return`<h3>${GROUPS[g][0]} · ${tiePoints(g)} correct</h3><div class="opts">${o.map((x,k)=>`<button class="opt ${done&&k==c?"right":""} ${done&&a==k&&k!=c?"wrong":""} ${a==k?"picked":""}" onclick="markTie(${i},${g},${k})"><b>${L[k]}</b>${esc(x)}</button>`).join("")}</div>`}
+function tieTeamContent(i,g){const[q,o,c]=TIE_Q[i],a=S.tieAns[`${g}:${i}`],done=a!==undefined;return`<h3>${GROUPS[g][0]} · ${tiePoints(g)} correct</h3><div class="res" style="margin:0 0 6px;font-size:.8rem">⭐ MVP answers: ${teamMvp(g).map(esc).join(" / ")}</div><div class="opts">${o.map((x,k)=>`<button class="opt ${done&&k==c?"right":""} ${done&&a==k&&k!=c?"wrong":""} ${a==k?"picked":""}" onclick="markTie(${i},${g},${k})"><b>${L[k]}</b>${esc(x)}</button>`).join("")}</div>`}
 function go(k){const max=S.q.length+(tiedGroups().length?TIE_Q.length:0);if(k<0||k>=max)return;stopTimer();cur=k;render()}
 function clr(i){const priorTie=tiedGroups().join(",");delete S.ans[i];if(priorTie!==tiedGroups().join(","))S.tieAns={};save();render()}
 function markTie(i,g,a){S.tieAns[`${g}:${i}`]=a;save();$(`tie-team-${g}`).innerHTML=tieTeamContent(i,g);const dot=$("dots").children[S.q.length+i];dot.classList.toggle("c",tiedGroups().every(group=>S.tieAns[`${group}:${i}`]!==undefined))}
 
 /* ===================== 4. RESULTS ===================== */
 function score(){
- const w=winnerInfo(),marked=S.q.filter((_,i)=>S.ans[i]!==undefined).length;
+ const w=winnerInfo(),wg=winnerGroup(),mv=mvpInfo(),marked=S.q.filter((_,i)=>S.ans[i]!==undefined).length;
  $("vS").innerHTML=
-  (w?`<div class="grp full win"><b>🏆 ${esc(w)}</b></div>`:`<div class="grp full win">Final result appears once all 18 questions are marked (${marked} of 18 so far).</div>`)+
+  (w?`<div class="grp full win"><b>${wg!==null?"👑":"🏆"} ${esc(w)}</b></div>`+(mv?`<div class="grp full win mvp"><b>⭐ MVP: ${mv.names.map(esc).join(" &amp; ")}</b> — ${mv.pts} points</div>`:""):`<div class="grp full win">Final result appears once all 18 questions are marked (${marked} of 18 so far).</div>`)+
   GROUPS.map(([gn,ms],g)=>{let gt=0;
-  const rows=ms.map((n,m)=>{let t=0;const cells=[0,1].map(k=>{const i=g*6+m*2+k,p=pts(i);if(p!==null)t+=p;return`<td>${p===null?"–":(p>0?"+"+p:p)}</td>`}).join("");gt+=t;return`<tr><td><b>${n}</b></td>${cells}<td><b class="${t>0?"pos":t<0?"neg":""}">${t}</b></td></tr>`}).join("");
-  return`<div class="grp"><h2><span>${gn}</span><span>Total: ${gt}</span></h2><table><tr><th>Member</th><th>Politics / Intl</th><th>Business</th><th>Total</th></tr>${rows}</table></div>`}).join("")
-  +(tiedGroups().length?`<div class="grp full"><h2>Tie-breaker</h2><p>Unlocked for ${tiedGroups().map(g=>GROUPS[g][0]).join(", ")} because the completed scorecard is tied for the lead.</p>${tiedGroups().map(g=>`<p>${GROUPS[g][0]}: ${tiePoints(g)} / ${TIE_Q.length} correct</p>`).join("")}<p><b>${tieBreakStatus(tiedGroups())}</b></p></div>`:"")
+  const rows=ms.map((n,m)=>{let t=0;const cells=[0,1].map(k=>{const i=g*6+m*2+k,p=pts(i);if(p!==null)t+=p;return`<td>${p===null?"–":(p>0?"+"+p:p)}</td>`}).join("");gt+=t;return`<tr><td><b>${n}</b>${mv&&mv.set.has(g+":"+m)?" ⭐":""}</td>${cells}<td><b class="${t>0?"pos":t<0?"neg":""}">${t}</b></td></tr>`}).join("");
+  return`<div class="grp${wg===g?" champ":""}"><h2><span>${wg===g?"👑 ":""}${gn}</span><span>Total: ${gt}</span></h2><table><tr><th>Member</th><th>Politics / Intl</th><th>Business</th><th>Total</th></tr>${rows}</table></div>`}).join("")
+  +(tiedGroups().length?`<div class="grp full"><h2>Tie-breaker</h2><p>Unlocked for ${tiedGroups().map(g=>GROUPS[g][0]).join(", ")} because the completed scorecard is tied for the lead. Each tied team\u2019s MVP answers the ${TIE_Q.length} tie-breaker questions: ${tiedGroups().map(g=>GROUPS[g][0]+" – "+teamMvp(g).join(" / ")).join("; ")}.</p>${tiedGroups().map(g=>`<p>${GROUPS[g][0]}: ${tiePoints(g)} / ${TIE_Q.length} correct</p>`).join("")}<p><b>${tieBreakStatus(tiedGroups())}</b></p></div>`:"")
   +`<div class="full"><button class="btn pri" onclick="dlPdf()">⬇ Download PDF</button> <button class="btn" onclick="tab('Q')">← Back to quiz</button> <button class="btn" onclick="if(confirm('Clear all marks?')){S.ans={};S.tieAns={};UL.clear();save();score()}">Reset all scores</button></div>`;
+ if(wg!==null)party();
 }
 
 function dlPdf(){
@@ -309,7 +398,7 @@ function dlPdf(){
  const fmt=p=>p===null?"-":p>0?"+"+p:String(p);
  const totals=groupTotals(),tied=tiedGroups();
  let y=800;
- T(40,y,"The IFB Times",26,2);T(245,y+2,"Quiz - 23 Nov 2026",13,1);y-=18;
+ T(40,y,"The IFB Times",26,2);T(245,y+2,"Quiz - 26 Nov 2026",13,1);y-=18;
  T(40,y,"Scorecard  |  Generated "+new Date().toLocaleString("en-IN"),9);y-=8;
  Ln(40,y,555,y,1.5);y-=26;
  T(40,y,"Standings",13,1);y-=8;Ln(40,y,555,y);y-=16;
@@ -317,7 +406,7 @@ function dlPdf(){
  order.forEach((g,r)=>{let n=0;for(let i=g*6;i<g*6+6;i++)if(S.ans[i]!==undefined)n++;
   T(48,y,(r+1)+".",11,1);T(70,y,GROUPS[g][0],11,1);T(220,y,"Total: "+totals[g],11,1);T(310,y,"("+n+" of 6 questions marked)",9);y-=18});
  const w=winnerInfo();
- if(w){y-=2;T(48,y,"Result: "+w,11,1);y-=18}
+ if(w){y-=2;T(48,y,"Result: "+w,11,1);y-=18;const mv=mvpInfo();if(mv){T(48,y,"MVP: "+mv.names.join(" & ")+" - "+mv.pts+" points",11,1);y-=18}}
  y-=10;
  GROUPS.forEach(([gn,ms],g)=>{
   R(40,y-5,515,20,.9);T(48,y,gn,12,1);T(470,y,"Total: "+totals[g],12,1);y-=24;
